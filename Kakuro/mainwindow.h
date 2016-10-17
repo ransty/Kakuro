@@ -20,8 +20,16 @@ private slots:
 
     void on_generateButton_clicked();
 
+    void on_playButton_clicked();
+
+    void on_backButton_clicked();
+
+    void on_quitButton_clicked();
+
 private:
     Ui::MainWindow *ui;
+
+    void generateKakuro();
 };
 
 #endif // MAINWINDOW_H
