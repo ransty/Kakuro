@@ -1,93 +1,46 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QStandardItemModel>
+#include <QStandardItem>
+#include <QFont>
+#include <string>
+#include <QBrush>
+#include <QColor>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget	*parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    // Show the start widget initially
-    ui->stackedWidget->setCurrentWidget(ui->start);
+    QStandardItemModel *model = new QStandardItemModel(9, 8, this);
+    ui->tableView->setModel(model);
+    for(int row = 0; row < 9; row++) {
+        for(int col = 0; col < 8; col++) {
+            QStandardItem *value;
+            QBrush brush(QColor(Qt::black));
+            int randomNumber;
+            QFont f("Smooth Sizes");
+            // Generate random number
+            randomNumber = rand() % 30 + 1;
+            f.setPointSize(30);
+            // Place the random number inside the QStandardItem
+            value = new QStandardItem(QString(QString::number(randomNumber)));
+            // Determine wether we want that square to be a solid block
+            // Based on either the input file or if we work it out, the randomly generated board (pt 8)
+            if ((row*1) + (col) == 6) {
+                value->setBackground(brush);
+                value->setText("");
+                // This line makes the QStandardItem read-only
+                value->setFlags(Qt::NoItemFlags);
+            }
+            value->setFont(f);
+            value->setTextAlignment(Qt::AlignCenter);
+            model->setItem(row, col, value);
+        }
+    }
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
-}
-
-/**
- * Generate button
- */
-void MainWindow::on_generateButton_clicked()
-{
-    for (int i = 0; i <= ui->progressBar->maximum(); i++) {
-        ui->progressBar->setValue(i);
-    }
-
-    // Generate a kakuro puzzle
-    generateKakuro();
-
-    // Enable the play button
-    ui->playButton->setEnabled(true);
-
-    // Disable the generate button
-    ui->generateButton->setEnabled(false);
-
-    // Enable the reset button
-    ui->resetButton->setEnabled(true);
-
-}
-
-/**
- * Reset button
- */
-void MainWindow::on_resetButton_clicked()
-{
-    // Reset the progress bar
-    ui->progressBar->setValue(0);
-
-    // Disable the play button
-    ui->playButton->setEnabled(false);
-
-    // Enable the generate button
-    ui->generateButton->setEnabled(true);
-
-    // Disable the reset button
-    ui->resetButton->setEnabled(false);
-}
-
-/**
- * Quit button
- */
-void MainWindow::on_quitButton_clicked()
-{
-    this->close();
-}
-
-/**
- * Play button
- */
-void MainWindow::on_playButton_clicked()
-{
-    ui->stackedWidget->setCurrentWidget(ui->kakuro);
-}
-
-/**
- * Back button
- */
-void MainWindow::on_backButton_clicked()
-{
-    // Reset the game
-    on_resetButton_clicked();
-
-    // Show the start screen
-    ui->stackedWidget->setCurrentWidget(ui->start);
-}
-
-/**
- * Method to generate a kakuro puzzle
- */
-void MainWindow::generateKakuro()
-{
-
+   delete ui;
 }
