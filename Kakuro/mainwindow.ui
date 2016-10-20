@@ -6,19 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
+    <width>650</width>
     <height>650</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>100</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="minimumSize">
    <size>
-    <width>520</width>
+    <width>650</width>
     <height>650</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>520</width>
+    <width>650</width>
     <height>650</height>
    </size>
   </property>
@@ -31,6 +37,12 @@
    <string>Kakuro</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stackedWidget">
@@ -38,28 +50,34 @@
        <number>0</number>
       </property>
       <widget class="QWidget" name="start">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <widget class="QWidget" name="horizontalLayoutWidget_2">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>631</width>
-          <height>682</height>
+          <width>24880</width>
+          <height>1002</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QTableView" name="tableView">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>1</horstretch>
              <verstretch>1</verstretch>
             </sizepolicy>
            </property>
            <property name="minimumSize">
             <size>
-             <width>248</width>
-             <height>285</height>
+             <width>24878</width>
+             <height>1000</height>
             </size>
            </property>
            <property name="sizeIncrement">
@@ -90,13 +108,13 @@
             <bool>false</bool>
            </attribute>
            <attribute name="horizontalHeaderDefaultSectionSize">
-            <number>60</number>
+            <number>40</number>
            </attribute>
            <attribute name="horizontalHeaderMinimumSectionSize">
             <number>60</number>
            </attribute>
            <attribute name="verticalHeaderDefaultSectionSize">
-            <number>60</number>
+            <number>40</number>
            </attribute>
            <attribute name="verticalHeaderMinimumSectionSize">
             <number>60</number>
@@ -185,8 +203,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>520</width>
-     <height>21</height>
+     <width>650</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>

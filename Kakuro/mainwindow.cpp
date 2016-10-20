@@ -19,19 +19,19 @@ MainWindow::MainWindow(QWidget	*parent):
     ui->setupUi(this);
     QStandardItemModel *model = new QStandardItemModel(9, 8, this);
     ui->tableView->setModel(model);
-    for(int row = 0; row < 9; row++) {
-        for(int col = 0; col < 8; col++) {
+    for(int row = 0; row < 13; row++) {
+        for(int col = 0; col < 13; col++) {
             QStandardItem *value;
             QBrush brush = QBrush(QColor(Qt::black));
             QFont f("Smooth Sizes");
             // Generate random number
-            int randNum = rand()%(9-1 + 1) + 1;
+            int randNum = rand()%(15-1 + 1) + 1;
             f.setPointSize(30);
             // Place the random number inside the QStandardItem
             value = new QStandardItem(QString(QString::number(randNum)));
             // Determine wether we want that square to be a solid block
             // Based on either the input file or if we work it out, the randomly generated board (pt 8)
-            if ((row*1) + (col) == 6) {
+            if (row == 0 || col == 0 || randNum >= 10) {
                 value->setBackground(brush);
                 value->setText("");
                 // This line makes the QStandardItem read-only
