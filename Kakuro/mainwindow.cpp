@@ -6,11 +6,16 @@
 #include <string>
 #include <QBrush>
 #include <QColor>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 MainWindow::MainWindow(QWidget	*parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    //srand used to create random numbers
+    srand(time(NULL));
     ui->setupUi(this);
     QStandardItemModel *model = new QStandardItemModel(9, 8, this);
     ui->tableView->setModel(model);
@@ -18,13 +23,12 @@ MainWindow::MainWindow(QWidget	*parent):
         for(int col = 0; col < 8; col++) {
             QStandardItem *value;
             QBrush brush = QBrush(QColor(Qt::black));
-            int randomNumber;
             QFont f("Smooth Sizes");
             // Generate random number
-            randomNumber = rand() % 30 + 1;
+            int randNum = rand()%(9-1 + 1) + 1;
             f.setPointSize(30);
             // Place the random number inside the QStandardItem
-            value = new QStandardItem(QString(QString::number(randomNumber)));
+            value = new QStandardItem(QString(QString::number(randNum)));
             // Determine wether we want that square to be a solid block
             // Based on either the input file or if we work it out, the randomly generated board (pt 8)
             if ((row*1) + (col) == 6) {
