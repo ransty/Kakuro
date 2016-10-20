@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget	*parent):
     for(int row = 0; row < 9; row++) {
         for(int col = 0; col < 8; col++) {
             QStandardItem *value;
-            QBrush brush(QColor(Qt::black));
+            QBrush brush = QBrush(QColor(Qt::black));
             int randomNumber;
             QFont f("Smooth Sizes");
             // Generate random number
