@@ -260,7 +260,46 @@ void MainWindow::on_RandomNumbers_clicked()
 
 void MainWindow::on_saveFileButton_clicked()
 {
+    //opens save file dialog
+    QString fileName = QFileDialog::getSaveFileName(this,tr("Save Image"), "",tr("Text Files (*.txt)"));
 
+    //check if the file name is empty
+    if(fileName.isEmpty())
+        return;
+    else
+    {
+        //creates the file if there was a file name
+        QFile file(fileName);
+        //checks if the file can be opened in write only mode
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            //displays an error message
+            QMessageBox::information(this, tr("unable to open file"),file.errorString());
+            return;
+        }
+
+        //creates a QTextStream object to write to the file
+        QTextStream out(&file);
+
+        //loops through each cell in the board array
+        for(int i = 0; i<(int) board.size(); ++i){
+            for(int j = 0; j<(int)board[i].size(); ++j)
+            {
+                // writes the value to the file
+                out << board[i][j];
+
+                // writes a comma after a value or adds a new line
+                if (j != board[i].size()-1)
+                    out << ',';
+                else
+                    out << '\n';
+            }
+        }
+
+        //flushes the file and closes it
+        file.flush();
+        file.close();
+    }
 }
 
 void MainWindow::on_loadFileButton_clicked()
