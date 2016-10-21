@@ -28,9 +28,12 @@ private:
     void drawBoard();
     void setBoardSize(int, int);
     void populateBoardRandom();
+    void createRandomLayout();
     void populateBoardFromFile();
+    void createBlankBoardFromSolution();
     bool validateFile(QFile*);
     std::vector<std::vector<double>> board;
+    std::vector<std::vector<double>> boardSolution;
 };
 
 #endif // MAINWINDOW_H

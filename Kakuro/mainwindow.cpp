@@ -15,8 +15,19 @@
 #include <QMessageBox>
 #include <sstream>
 
-//board to parse to drawBoard()
+
+//both boards use the same number standards:
+//-1 = answer cell
+//-2 = grey cell
+//0 = blank cell
+//1-9 = filled in cell
+
+//board holds the current values of the visual game board
 std::vector<std::vector<double>> board;
+
+//boardSolution contains the numbers that are needed to solve the board
+//these numbers are never visable to the user
+std::vector<std::vector<double>> boardSolution;
 
 MainWindow::MainWindow(QWidget	*parent):
     QMainWindow(parent),
@@ -52,17 +63,37 @@ void MainWindow::drawBoard(){
             QStandardItem *cell;
             //checks if the current board value is 0
             //if a value is 0, it is a black square
-            if(board[i][j] == 0){
-                //sets all formatting for a black cell
+            if(board[i][j] == -1){
+                //answer cell
+                //sets all formatting for an answer cell
                 cell = new QStandardItem();
-                QBrush brush = QBrush(QColor(Qt::black));
+                QBrush brush = QBrush(QColor(Qt::blue));
+                cell->setBackground(brush);
+                cell->setFlags(Qt::NoItemFlags);
+
+            }
+            else if(board[i][j] == 0){
+                //blank square
+                cell = new QStandardItem();
+            }
+            else if(board[i][j]>=1 && board[i][j]<=9){
+                //valid number
+
+                //gives the cell a number from the board vector
+                cell = new QStandardItem(QString::number(board[i][j]));
+            }
+            else if(board[i][j] <= -2){
+                //grey cell
+                //sets all formatting for a grey cell
+                cell = new QStandardItem();
+                QBrush brush = QBrush(QColor(Qt::gray));
                 cell->setBackground(brush);
                 cell->setFlags(Qt::NoItemFlags);
 
             }
             else{
-                //gives the cell a number from the board vector
-                cell = new QStandardItem(QString::number(board[i][j]));
+                //should never reach
+                cell = new QStandardItem();
             }
 
             //a bit of formatting for the cell
@@ -85,8 +116,10 @@ void MainWindow::setBoardSize(int height, int width){
     //pretty simple,
     //just sets the size of the multidimentional array
     board.resize(height);
+    boardSolution.resize(height);
     for(int i = 0; i<height; i++){
         board[i].resize(width);
+        boardSolution[i].resize(width);
     }
 }
 
@@ -94,23 +127,104 @@ void MainWindow::setBoardSize(int height, int width){
 void MainWindow::populateBoardRandom(){
 
     //loops through each rown
-    for(int i = 0; i<(int)board.size(); i++){
+    for(int i = 0; i<(int)boardSolution.size(); i++){
         //loops through each column in each row
-        for(int j = 0; j<(int)board[i].size(); j++){
+        for(int j = 0; j<(int)boardSolution[i].size(); j++){
             //first row and column
             if(i == 0 || j == 0){
-                board[i][j] = 0;
+                boardSolution[i][j] = -2;
             }
             else{
                 //generate random number between 1 and 9
                 int randNum = rand()%(9-1 + 1) + 1;
                 //places the random number in the current board cell
-                board[i][j] = randNum;
+                boardSolution[i][j] = randNum;
             }
 
         }
     }
 
+
+    createBlankBoardFromSolution();
+
+}
+
+void MainWindow::createRandomLayout(){
+    //unimplemented at the moment
+
+    //places random grey squares to start with
+    //loops through each rown
+    for(int i = 0; i<(int)boardSolution.size(); i++){
+        //loops through each column in each row
+        for(int j = 0; j<(int)boardSolution[i].size(); j++){
+            int chance = 3;
+            //creates a random number
+            int randNum = rand()%(chance-1 + 1) + 1;
+            if(randNum == 1){
+                board[i][j] = -2;
+                boardSolution[i][j] = -2;
+            }
+
+
+        }
+    }
+
+
+
+    //need to now make sure there are no unreachable squares
+
+    //start with squares with 0 non-grey neighbours
+
+    //loops through each row
+    for(int i = 1; i<(int)boardSolution.size()-1; i++){
+        //loops through each column in each row
+        for(int j = 1; j<(int)boardSolution[i].size()-1; j++){
+            if(board[i][j] == 0  && board[i+1][j] == -2 && board[i-1][j] == -2 && board[i][j+1] == -2 && board[i][j-1] == -2){
+                board[i][j] = -2;
+                boardSolution[i][j] = -2;
+            }
+        }
+        //the reason for checking this seperately is to avoid trying j+1 when there is no such cell
+        //check last cell in row
+        if(board[i][board[i].size()-1] == 0 && board[i-1][board[i].size()-1] == -2 && board[i+1][board[i].size()-1] == -2 && board[i][board[i].size()-2] == -2){
+            board[i][board[i].size()-1] = -2;
+            boardSolution[i][board[i].size()-1] = -2;
+        }
+
+
+    }
+    //check last row
+    for(int i = 1; i<(int)board[0].size()-1; i++){
+        if(board[board.size()-1][i] == 0 && board[board.size()-1][i+1] == -2 && board[board.size()-1][i-1] == -2 && board[board.size()-2][i]){
+            board[board.size()-1][i] = -2;
+            boardSolution[board.size()-1][i] = -2;
+
+
+        }
+
+    }
+
+}
+
+void MainWindow::createBlankBoardFromSolution(){
+    //this is where we add up the numbers from boardSolution and put them in the cells of board
+    //it is also where we copy all the grey cells
+
+    //loops through each rown
+    for(int i = 0; i<(int)boardSolution.size(); i++){
+        //loops through each column in each row
+        for(int j = 0; j<(int)boardSolution[i].size(); j++){
+            if(boardSolution[i][j] == -2){
+                board[i][j] = -2;
+            }
+            else if(boardSolution[i][j] == -1){
+                board[i][j] = -1;
+            }
+            else{
+                board[i][j] = 0;
+            }
+        }
+    }
 }
 
 
@@ -202,6 +316,7 @@ void MainWindow::populateBoardFromFile(){
             lineNumber++;
         }
     }
+    drawBoard();
 
 }
 
@@ -220,11 +335,11 @@ bool MainWindow::validateFile(QFile* file){
        //check all lines are the same length
        //first line
        if(lineLength == 0){
-           lineLength = line.length();
+           lineLength = line.count(",");
        }
        else{
            //line is not the same length as the last line
-           if(lineLength!=line.length()){
+           if(lineLength!=line.count(",")){
                //failed
                return false;
            }
@@ -232,7 +347,7 @@ bool MainWindow::validateFile(QFile* file){
 
 
        //checks if the current line contains anything but numbers and commas
-       QRegExp r("^[0-9](,[0-9])*$");
+       QRegExp r("^-?[0-9](,-?[0-9])*$");
        if(line.contains(r)){
 
        }
@@ -241,6 +356,7 @@ bool MainWindow::validateFile(QFile* file){
            return false;
        }
     }
+
 
 //made it to the end of testing
 return true;
@@ -253,6 +369,10 @@ void MainWindow::on_RandomNumbers_clicked()
     setBoardSize(ui->heightSpinBox->value(), ui->widthSpinBox->value());
     //populates the board vector
     populateBoardRandom();
+    //create random layout
+    createRandomLayout();
+    //calculate solutions
+    //calculateSolutions();
     //draws the board to the screen
     drawBoard();
 
@@ -260,6 +380,10 @@ void MainWindow::on_RandomNumbers_clicked()
 
 void MainWindow::on_saveFileButton_clicked()
 {
+    //-----------------
+    //currently broken
+    //needs to save with numbers from
+
     //opens save file dialog
     QString fileName = QFileDialog::getSaveFileName(this,tr("Save Image"), "",tr("Text Files (*.txt)"));
 
@@ -305,5 +429,4 @@ void MainWindow::on_saveFileButton_clicked()
 void MainWindow::on_loadFileButton_clicked()
 {
     populateBoardFromFile();
-    drawBoard();
 }
