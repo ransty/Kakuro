@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QFile>
+#include <QPoint>
 
 namespace Ui {
 class MainWindow;
@@ -18,10 +19,9 @@ public:
 
 private slots:
     void on_RandomNumbers_clicked();
-
     void on_saveFileButton_clicked();
-
     void on_loadFileButton_clicked();
+    void menuRequest(QPoint pos);
 
 private:
     Ui::MainWindow *ui;

@@ -29,15 +29,25 @@ std::vector<std::vector<double>> board;
 //these numbers are never visable to the user
 std::vector<std::vector<double>> boardSolution;
 
+//the board layout
+QStandardItemModel *model;
+//creates a new cell
+QStandardItem *cell;
+QFont f("Smooth Sizes");
+
 MainWindow::MainWindow(QWidget	*parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    //srand used to create random numbers
+    // srand used to create random numbers
     srand(time(NULL));
 
     ui->setupUi(this);
-
+    // Linking mouse click to slot menuRequest
+    ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(menuRequest(QPoint)));
+    // Disable editing text using keyboard in the table
+    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 }
 
@@ -48,24 +58,19 @@ MainWindow::~MainWindow()
 
 //uses the board vector to draw the board to the screen
 void MainWindow::drawBoard(){
-
-    //the board layout
-    QStandardItemModel *model = new QStandardItemModel(board.size(), board[0].size(), this);
-
+     model = new QStandardItemModel(board.size(), board[0].size(), this);
+    // set the table view to the model
     ui->tableView->setModel(model);
-
     //loops through each cell in the board array
     for(int i = 0; i<(int) board.size(); i++){
         for(int j = 0; j<(int)board[i].size(); j++){
 
-
-            //creates a new cell
-            QStandardItem *cell;
             //checks if the current board value is 0
             //if a value is 0, it is a black square
             if(board[i][j] == -1){
                 //answer cell
                 //sets all formatting for an answer cell
+                f.setPointSize(30); // sets font size
                 cell = new QStandardItem();
                 QBrush brush = QBrush(QColor(Qt::blue));
                 cell->setBackground(brush);
@@ -73,12 +78,13 @@ void MainWindow::drawBoard(){
 
             }
             else if(board[i][j] == 0){
-                //blank square
-                cell = new QStandardItem();
+                f.setPointSize(9); // sets font size
+                // Creates a cell with a string representation numbers 1-9
+                cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
             }
             else if(board[i][j]>=1 && board[i][j]<=9){
                 //valid number
-
+                f.setPointSize(30); // sets font size
                 //gives the cell a number from the board vector
                 cell = new QStandardItem(QString::number(board[i][j]));
             }
@@ -97,8 +103,6 @@ void MainWindow::drawBoard(){
             }
 
             //a bit of formatting for the cell
-            QFont f("Smooth Sizes");
-            f.setPointSize(30);
             cell->setFont(f);
             cell->setTextAlignment(Qt::AlignCenter);
 
@@ -413,7 +417,7 @@ void MainWindow::on_saveFileButton_clicked()
                 out << board[i][j];
 
                 // writes a comma after a value or adds a new line
-                if (j != board[i].size()-1)
+                if (j != (int)board[i].size()-1)
                     out << ',';
                 else
                     out << '\n';
@@ -429,4 +433,59 @@ void MainWindow::on_saveFileButton_clicked()
 void MainWindow::on_loadFileButton_clicked()
 {
     populateBoardFromFile();
+}
+
+void MainWindow::menuRequest(QPoint pos)
+{
+    // Retrieving the row and column of the mouse click on the grid
+    QModelIndex index = ui->tableView->indexAt(pos);
+    // Create a menu item
+    QMenu menu(this);
+    // Create actions for the menu
+    QAction *clearValue;
+    QAction *setValue1;
+    QAction *setValue2;
+    QAction *setValue3;
+    QAction *setValue4;
+    QAction *setValue5;
+    QAction *setValue6;
+    QAction *setValue7;
+    QAction *setValue8;
+    QAction *setValue9;
+    // Set text for the action and add them to the menu
+    clearValue = menu.addAction("Clear set value");
+    setValue1 = menu.addAction("Set value to 1");
+    setValue2 = menu.addAction("Set value to 2");
+    setValue3 = menu.addAction("Set value to 3");
+    setValue4 = menu.addAction("Set value to 4");
+    setValue5 = menu.addAction("Set value to 5");
+    setValue6 = menu.addAction("Set value to 6");
+    setValue7 = menu.addAction("Set value to 7");
+    setValue8 = menu.addAction("Set value to 8");
+    setValue9 = menu.addAction("Set value to 9");
+
+    // Action that was clicked on
+    QAction *action = menu.exec(ui->tableView->viewport()->mapToGlobal(pos));
+
+    // If it is a set action
+    if (action->text().contains("Set value to ")) {
+        // Create a new cell with the selected number
+        cell = new QStandardItem(action->text().right(1));
+        // Update the board with the selected number
+        board[index.row()][index.column()] = action->text().right(1).toInt();
+        // Change the font size
+        f.setPointSize(30);
+    // If it was clearValue action
+    } else if (action->text().contains("Clear")) {
+        // Create a cell with the default string for blank cell
+        cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
+        //update the cell in the board vector
+        board[index.row()][index.column()] = 0;
+        // change the font size
+        f.setPointSize(9);
+    }
+    // set font and alignment of the cell and set it to the model
+    cell->setFont(f);
+    cell->setTextAlignment(Qt::AlignCenter);
+    model->setItem(index.row(), index.column(), cell);
 }
