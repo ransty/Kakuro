@@ -87,7 +87,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string extracomment="Click a box and type in your answer">Click a box and type in your answer</string>
+            <string extracomment="Right click on a box to choose a number">Right click on a box to choose a number</string>
            </property>
            <property name="lineWidth">
             <number>1</number>

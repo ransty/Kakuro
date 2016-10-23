@@ -28,6 +28,7 @@ private:
     void drawBoard();
     void setBoardSize(int, int);
     void populateBoardRandom();
+    void populateAnswerCells();
     void createRandomLayout();
     void populateBoardFromFile();
     void createBlankBoardFromSolution();

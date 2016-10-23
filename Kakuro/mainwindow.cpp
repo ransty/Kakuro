@@ -7,6 +7,7 @@
 #include <QBrush>
 #include <QColor>
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
@@ -16,17 +17,30 @@
 #include <sstream>
 
 
+
 //both boards use the same number standards:
-//-1 = answer cell
+
+//-1 = answer cell - Initially,
+//after calculations of sums, it is store in the following format
+//horizontal sums are multiplied by 1000 and vertical sums are multiplied by 10 both values are added if in the same cell
+//E.g.  5000 will be horizontal sum 5
+//      160 will be vertical sum 16
+// if in the same cell, it will be 5160
+//Another E.g. 20220 means 20 - horizontal and 22 - vertical
+//See MainWindow::populateAnswerCell() to see how this works
+
 //-2 = grey cell
+
 //0 = blank cell
+
 //1-9 = filled in cell
+
 
 //board holds the current values of the visual game board
 std::vector<std::vector<double>> board;
 
 //boardSolution contains the numbers that are needed to solve the board
-//these numbers are never visable to the user
+//these numbers are never visible to the user
 std::vector<std::vector<double>> boardSolution;
 
 //the board layout
@@ -65,31 +79,53 @@ void MainWindow::drawBoard(){
     for(int i = 0; i<(int) board.size(); i++){
         for(int j = 0; j<(int)board[i].size(); j++){
 
-            //checks if the current board value is 0
-            //if a value is 0, it is a black square
-            if(board[i][j] == -1){
-                //answer cell
+            // Answer cell
+            if(board[i][j] >= 10){
                 //sets all formatting for an answer cell
-                f.setPointSize(30); // sets font size
+                f.setPointSize(9); // sets font size
                 cell = new QStandardItem();
                 QBrush brush = QBrush(QColor(Qt::blue));
                 cell->setBackground(brush);
                 cell->setFlags(Qt::NoItemFlags);
+                QString answer = ""; // Sums will be appended here
+
+                // For information on how both sums are stored in the vectors check populateAnswerCells() method
+
+                // if not a horizontal sum
+                if (board[i][j]/1000 < 1) {
+                    answer += "\n\n";
+                } else {
+                    // Horizontal sum
+                    std::stringstream convert; // Used for converting int to string
+                    convert << floor(board[i][j]/1000); // Get horizontal sum using Math.floor()
+                    answer = QString::fromStdString(convert.str()); // Append the converted int to the answer QString
+                    answer += "\n\n"; // Some spaces to differentiate between a horizontal and vertical some
+                }
+                // Check if there is a vertical sum
+                if (floor((int)(board[i][j]/10)%100) != 0){
+                    std::stringstream convert; // for converting int to string
+                    convert << floor((int)(board[i][j]/10)%100);
+                    answer += QString::fromStdString(convert.str());
+                }
+                // Set the QString to the cell
+                cell = new QStandardItem(answer);
 
             }
+            // Blank cell
             else if(board[i][j] == 0){
                 f.setPointSize(9); // sets font size
                 // Creates a cell with a string representation numbers 1-9
                 cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
             }
+            // Filled in cell
             else if(board[i][j]>=1 && board[i][j]<=9){
-                //valid number
+                //valid number 1-9
                 f.setPointSize(30); // sets font size
                 //gives the cell a number from the board vector
                 cell = new QStandardItem(QString::number(board[i][j]));
             }
+            // Grey cell
             else if(board[i][j] <= -2){
-                //grey cell
                 //sets all formatting for a grey cell
                 cell = new QStandardItem();
                 QBrush brush = QBrush(QColor(Qt::gray));
@@ -110,13 +146,24 @@ void MainWindow::drawBoard(){
             //sets the cell into the model
             model->setItem(i, j, cell);
 
+            // Prints out the solution FOR TESTING PURPOSES
+            std::cout << boardSolution[i][j] << ", " << std::flush;
         }
+        std::cout << std::endl;
     }
 
 }
 
-//sets the board size using two parameters
+/**
+ * @brief MainWindow::setBoardSize Sets the size of both vectors and clears them
+ * @param height number of rows in the board
+ * @param width number of colums in the board
+ */
 void MainWindow::setBoardSize(int height, int width){
+    // Empty the boards, this is needed if the generate button is pressed multiple times
+    board = {};
+    boardSolution = {};
+
     //pretty simple,
     //just sets the size of the multidimentional array
     board.resize(height);
@@ -130,46 +177,109 @@ void MainWindow::setBoardSize(int height, int width){
 //populates the board with random numbers
 void MainWindow::populateBoardRandom(){
 
-    //loops through each rown
+    //loops through each row
     for(int i = 0; i<(int)boardSolution.size(); i++){
         //loops through each column in each row
         for(int j = 0; j<(int)boardSolution[i].size(); j++){
-            //first row and column
-            if(i == 0 || j == 0){
-                boardSolution[i][j] = -2;
-            }
-            else{
+            // If not a grey cell or answer cell
+            if(boardSolution[i][j] >= 0){
                 //generate random number between 1 and 9
                 int randNum = rand()%(9-1 + 1) + 1;
                 //places the random number in the current board cell
                 boardSolution[i][j] = randNum;
             }
+        }
+    }  
+}
 
+/**
+ * @brief MainWindow::populateAnswerCells sums up the horizontal and vertical sums
+ *  and updates the boardSolution vector to contain the sums
+ */
+void MainWindow::populateAnswerCells() {
+
+    //loops through each row
+    for(int i = 0; i<(int)boardSolution.size(); i++){
+        //loops through each column in each row
+        for(int j = 0; j<(int)boardSolution[i].size(); j++){
+
+            // for horizontal sums
+            // Don't calculate sums if it is the last column
+            if(j < ((int)boardSolution[i].size()-1)){
+                // Check whether the current cell is grey and the next one on the right is a blank
+                if(boardSolution[i][j] == -2 && boardSolution[i][j+1] > 0){
+                    // Index of the next blank cells
+                    int colIndex = j + 1;
+                    // Sum for the column
+                    int colSum = 0;
+                    // Set the values of the cell back to 0 (from -1)
+                    boardSolution[i][j] = 0;
+                    // Loop until the cell on the right is not a grey cell
+                    while(colIndex < (int)boardSolution[i].size() && boardSolution[i][colIndex] > 0){
+                        // Add the values of all the blank cells
+                        colSum += boardSolution[i][colIndex];
+                        colIndex++;
+                    }
+                    // Multiply the horizontal sum by 1000
+                    // This is because in some cases, both horizontal and vertical sums may be stored in one place
+                    // To get back the original sum value for a horizontal cell, just divide the current value by 1000
+                    // and remove the decimal point if any by rounding off using Math.floor()
+                    colSum = colSum*1000;
+                    boardSolution[i][j] = colSum;
+                }
+            }
+            // for vertical sums
+            // Don't calculate sums if it is the last row
+            if(i < ((int)boardSolution.size()-1)){
+                // Check whether the current cell is grey or a cell with horizontal sum, and whether the cell below is blank
+                if((boardSolution[i][j] == -2 || boardSolution[i][j] >= 1000) && boardSolution[i+1][j] > 0){
+                    if (boardSolution[i][j] == -2){
+                        // If the cell is blank it will have a value of -2, so we need to make it 0 first
+                        boardSolution[i][j] = 0;
+                    }
+                    // Index of blank cells below
+                    int rowIndex = i + 1;
+                    // Sum of the row
+                    int rowSum = 0;
+                    // Loop until the cell below is not a grey cell
+                    while(rowIndex < (int)boardSolution.size() && boardSolution[rowIndex][j] > 0){
+                        // Add the values of all the blank cells below
+                        rowSum += boardSolution[rowIndex][j];
+                        rowIndex++;
+                    }
+                    // Multiply the vertical sum by 10
+                    // This is because in some cases, both horizontal and vertical sums may be stored in one place
+                    // To get back the original sum value for a vertical cell, just divide it by 10 then modulo % 100
+                    // and remove the decimal points if any by rounding off using Math.floor()
+                    rowSum = rowSum * 10;
+                    boardSolution[i][j] += rowSum;
+                }
+            }
         }
     }
-
-
-    createBlankBoardFromSolution();
-
 }
 
 void MainWindow::createRandomLayout(){
     //unimplemented at the moment
 
     //places random grey squares to start with
-    //loops through each rown
+    //loops through each row
     for(int i = 0; i<(int)boardSolution.size(); i++){
         //loops through each column in each row
         for(int j = 0; j<(int)boardSolution[i].size(); j++){
-            int chance = 3;
-            //creates a random number
-            int randNum = rand()%(chance-1 + 1) + 1;
-            if(randNum == 1){
+            // All grey for top row and left column
+            if(i == 0 || j == 0){
                 board[i][j] = -2;
                 boardSolution[i][j] = -2;
+            } else {
+                int chance = 3;
+                //creates a random number
+                int randNum = rand()%(chance-1 + 1) + 1;
+                if(randNum == 1){
+                    board[i][j] = -2;
+                    boardSolution[i][j] = -2;
+                }
             }
-
-
         }
     }
 
@@ -211,18 +321,17 @@ void MainWindow::createRandomLayout(){
 }
 
 void MainWindow::createBlankBoardFromSolution(){
-    //this is where we add up the numbers from boardSolution and put them in the cells of board
-    //it is also where we copy all the grey cells
+    // this is where we copy all the grey cells and answer cells from boardSolution to board
 
-    //loops through each rown
+    //loops through each row
     for(int i = 0; i<(int)boardSolution.size(); i++){
         //loops through each column in each row
         for(int j = 0; j<(int)boardSolution[i].size(); j++){
             if(boardSolution[i][j] == -2){
                 board[i][j] = -2;
             }
-            else if(boardSolution[i][j] == -1){
-                board[i][j] = -1;
+            else if(boardSolution[i][j] >= 100){
+                board[i][j] = boardSolution[i][j];
             }
             else{
                 board[i][j] = 0;
@@ -371,10 +480,14 @@ void MainWindow::on_RandomNumbers_clicked()
 {
     //set up size of array
     setBoardSize(ui->heightSpinBox->value(), ui->widthSpinBox->value());
-    //populates the board vector
-    populateBoardRandom();
     //create random layout
     createRandomLayout();
+    //populates the boardSolution vector
+    populateBoardRandom();
+    //Adds up the horizontal and vertical sums
+    populateAnswerCells();
+    //populates the board vector
+    createBlankBoardFromSolution();
     //calculate solutions
     //calculateSolutions();
     //draws the board to the screen
