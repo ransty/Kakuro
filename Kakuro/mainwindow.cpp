@@ -108,8 +108,10 @@ void MainWindow::drawBoard(){
                     answer += QString::fromStdString(convert.str());
                 }
                 // Set the QString to the cell
-                cell = new QStandardItem(answer);
-
+                // FYI: All of the prior settings were lost because u created a new object
+                // cell = new QStandardItem(answer);
+                // Easy fix dw lads
+                cell->setText(answer);
             }
             // Blank cell
             else if(board[i][j] == 0){
@@ -552,7 +554,8 @@ void MainWindow::menuRequest(QPoint pos)
 {
     // Retrieving the row and column of the mouse click on the grid
     QModelIndex index = ui->tableView->indexAt(pos);
-    if (board[index.row()][index.column()] >= 0) {
+    // If the cell is a blank cell (excludes sum cells, grey cells)
+    if (board[index.row()][index.column()] == 0) {
         // Create a menu item
         QMenu menu(this);
         // Create actions for the menu
@@ -581,6 +584,10 @@ void MainWindow::menuRequest(QPoint pos)
         // Action that was clicked on
         QAction *action = menu.exec(ui->tableView->viewport()->mapToGlobal(pos));
 
+        if (!action) {
+            // User didn't press any QAction
+            // Close the menu
+        } else {
         // If it is a set action
         if (action->text().contains("Set value to ")) {
             // Create a new cell with the selected number
@@ -598,9 +605,9 @@ void MainWindow::menuRequest(QPoint pos)
             // change the font size
             f.setPointSize(9);
         }
-        // set font and alignment of the cell and set it to the model
         cell->setFont(f);
         cell->setTextAlignment(Qt::AlignCenter);
         model->setItem(index.row(), index.column(), cell);
+    }
     }
 }
