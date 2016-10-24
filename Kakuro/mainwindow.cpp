@@ -555,7 +555,7 @@ void MainWindow::menuRequest(QPoint pos)
     // Retrieving the row and column of the mouse click on the grid
     QModelIndex index = ui->tableView->indexAt(pos);
     // If the cell is a blank cell (excludes sum cells, grey cells)
-    if (board[index.row()][index.column()] >= 0 && board[index.row()][index.colum()] <= 10) {
+    if (board[index.row()][index.column()] >= 0 && board[index.row()][index.column()] <= 10) {
         // Create a menu item
         QMenu menu(this);
         // Create actions for the menu
