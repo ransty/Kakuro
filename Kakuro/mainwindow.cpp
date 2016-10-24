@@ -503,35 +503,35 @@ void MainWindow::on_saveFileButton_clicked()
     //currently broken
     //needs to save with numbers from
 
-    //opens save file dialog
+    // Opens save file dialog
     QString fileName = QFileDialog::getSaveFileName(this,tr("Save Image"), "",tr("Text Files (*.txt)"));
 
-    //check if the file name is empty
+    // Check if the file name is empty
     if(fileName.isEmpty())
         return;
     else
     {
-        //creates the file if there was a file name
+        // Creates the file if there was a file name
         QFile file(fileName);
-        //checks if the file can be opened in write only mode
+        // Checks if the file can be opened in write only mode
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
         {
-            //displays an error message
+            // Displays an error message
             QMessageBox::information(this, tr("unable to open file"),file.errorString());
             return;
         }
 
-        //creates a QTextStream object to write to the file
+        // Creates a QTextStream object to write to the file
         QTextStream out(&file);
 
-        //loops through each cell in the board array
+        // Loops through each cell in the board array
         for(int i = 0; i<(int) board.size(); ++i){
             for(int j = 0; j<(int)board[i].size(); ++j)
             {
-                // writes the value to the file
+                // Writes the value to the file
                 out << board[i][j];
 
-                // writes a comma after a value or adds a new line
+                // Writes a comma after a value or adds a new line
                 if (j != (int)board[i].size()-1)
                     out << ',';
                 else
@@ -539,7 +539,7 @@ void MainWindow::on_saveFileButton_clicked()
             }
         }
 
-        //flushes the file and closes it
+        // Flushes the file and closes it
         file.flush();
         file.close();
     }
@@ -600,11 +600,12 @@ void MainWindow::menuRequest(QPoint pos)
         } else if (action->text().contains("Clear")) {
             // Create a cell with the default string for blank cell
             cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
-            //update the cell in the board vector
+            // Update the cell in the board vector
             board[index.row()][index.column()] = 0;
-            // change the font size
+            // Change the font size
             f.setPointSize(9);
         }
+        // Set font and alignment of the cell and set it to the model
         cell->setFont(f);
         cell->setTextAlignment(Qt::AlignCenter);
         model->setItem(index.row(), index.column(), cell);
