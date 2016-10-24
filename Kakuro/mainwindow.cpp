@@ -108,9 +108,6 @@ void MainWindow::drawBoard(){
                     answer += QString::fromStdString(convert.str());
                 }
                 // Set the QString to the cell
-                // FYI: All of the prior settings were lost because u created a new object
-                // cell = new QStandardItem(answer);
-                // Easy fix dw lads
                 cell->setText(answer);
             }
             // Blank cell
@@ -554,59 +551,64 @@ void MainWindow::menuRequest(QPoint pos)
 {
     // Retrieving the row and column of the mouse click on the grid
     QModelIndex index = ui->tableView->indexAt(pos);
-    // If the cell is a blank cell (excludes sum cells, grey cells)
-    if (board[index.row()][index.column()] >= 0 && board[index.row()][index.column()] <= 10) {
-        // Create a menu item
-        QMenu menu(this);
-        // Create actions for the menu
-        QAction *clearValue;
-        QAction *setValue1;
-        QAction *setValue2;
-        QAction *setValue3;
-        QAction *setValue4;
-        QAction *setValue5;
-        QAction *setValue6;
-        QAction *setValue7;
-        QAction *setValue8;
-        QAction *setValue9;
-        // Set text for the action and add them to the menu
-        clearValue = menu.addAction("Clear set value");
-        setValue1 = menu.addAction("Set value to 1");
-        setValue2 = menu.addAction("Set value to 2");
-        setValue3 = menu.addAction("Set value to 3");
-        setValue4 = menu.addAction("Set value to 4");
-        setValue5 = menu.addAction("Set value to 5");
-        setValue6 = menu.addAction("Set value to 6");
-        setValue7 = menu.addAction("Set value to 7");
-        setValue8 = menu.addAction("Set value to 8");
-        setValue9 = menu.addAction("Set value to 9");
-
-        // Action that was clicked on
-        QAction *action = menu.exec(ui->tableView->viewport()->mapToGlobal(pos));
-
-        // Making sure the user selects a QAction
-        if (action) {
-            // If it is a set action
-            if (action->text().contains("Set value to ")) {
-                // Create a new cell with the selected number
-                cell = new QStandardItem(action->text().right(1));
-                // Update the board with the selected number
-                board[index.row()][index.column()] = action->text().right(1).toInt();
-                // Change the font size
-                f.setPointSize(30);
-                // If it was clearValue action
-            } else if (action->text().contains("Clear")) {
-                // Create a cell with the default string for blank cell
-                cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
-                // Update the cell in the board vector
-                board[index.row()][index.column()] = 0;
-                // Change the font size
-                f.setPointSize(9);
-            }
-            // Set font and alignment of the cell and set it to the model
-            cell->setFont(f);
-            cell->setTextAlignment(Qt::AlignCenter);
-            model->setItem(index.row(), index.column(), cell);
-        }
+	// Check wheter the index has both non negative x and y positions
+	if (index.isValid()) { 
+	   // If the cell is a blank cell (excludes sum cells, grey cells)
+	    if (board[index.row()][index.column()] >= 0 && board[index.row()][index.column()] <= 10) {
+        	// Create a menu item
+	        QMenu menu(this);
+	        // Create actions for the menu
+        	QAction *clearValue;
+	        QAction *setValue1;
+	        QAction *setValue2;
+	        QAction *setValue3;
+	        QAction *setValue4;
+	        QAction *setValue5;
+	        QAction *setValue6;
+	        QAction *setValue7;
+	        QAction *setValue8;
+        	QAction *setValue9;
+	        // Set text for the action and add them to the menu
+        	clearValue = menu.addAction("Clear set value");
+	        setValue1 = menu.addAction("Set value to 1");
+	        setValue2 = menu.addAction("Set value to 2");
+	        setValue3 = menu.addAction("Set value to 3");
+	        setValue4 = menu.addAction("Set value to 4");
+	        setValue5 = menu.addAction("Set value to 5");
+	        setValue6 = menu.addAction("Set value to 6");
+	        setValue7 = menu.addAction("Set value to 7");
+        	setValue8 = menu.addAction("Set value to 8");
+	        setValue9 = menu.addAction("Set value to 9");
+	
+	        // Action that was clicked on
+	        QAction *action = menu.exec(ui->tableView->viewport()->mapToGlobal(pos));
+	
+	        // Making sure the user selects a QAction
+	        if (action) {
+	            // If it is a set action
+	            if (action->text().contains("Set value to ")) {
+	                // Create a new cell with the selected number
+	                cell = new QStandardItem(action->text().right(1));
+	                // Update the board with the selected number
+	                board[index.row()][index.column()] = action->text().right(1).toInt();
+	                // Change the font size
+	                f.setPointSize(30);
+	                // If it was clearValue action
+	            } else if (action->text().contains("Clear")) {
+	                // Create a cell with the default string for blank cell
+	                cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));	
+        	        // Update the cell in the board vector
+                	board[index.row()][index.column()] = 0;
+	                // Change the font size
+	                f.setPointSize(9);
+	            }
+	            // Set font and alignment of the cell and set it to the model
+	            cell->setFont(f);
+	            cell->setTextAlignment(Qt::AlignCenter);
+	            model->setItem(index.row(), index.column(), cell);
+	        }
+		// Now delete the action
+		delete action;
+	}
     }
 }
