@@ -551,7 +551,7 @@ void MainWindow::menuRequest(QPoint pos)
 {
     // Retrieving the row and column of the mouse click on the grid
     QModelIndex index = ui->tableView->indexAt(pos);
-	// Check wheter the index has both non negative x and y positions
+	// Check whether index has both non negative x and y positions
 	if (index.isValid()) { 
 	   // If the cell is a blank cell (excludes sum cells, grey cells)
 	    if (board[index.row()][index.column()] >= 0 && board[index.row()][index.column()] <= 10) {
