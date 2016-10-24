@@ -67,12 +67,12 @@ MainWindow::MainWindow(QWidget	*parent):
 
 MainWindow::~MainWindow()
 {
-   delete ui;
+    delete ui;
 }
 
 //uses the board vector to draw the board to the screen
 void MainWindow::drawBoard(){
-     model = new QStandardItemModel(board.size(), board[0].size(), this);
+    model = new QStandardItemModel(board.size(), board[0].size(), this);
     // set the table view to the model
     ui->tableView->setModel(model);
     //loops through each cell in the board array
@@ -191,7 +191,7 @@ void MainWindow::populateBoardRandom(){
                 boardSolution[i][j] = randNum;
             }
         }
-    }  
+    }
 }
 
 /**
@@ -440,41 +440,41 @@ void MainWindow::populateBoardFromFile(){
 bool MainWindow::validateFile(QFile* file){
     //safety check for file
     if (!file->open(QIODevice::ReadOnly | QIODevice::Text))
-            return false;
+        return false;
 
     QTextStream in(file);
     int lineLength = 0;
     while (!in.atEnd()) {
-       QString line = in.readLine();
+        QString line = in.readLine();
 
-       //check all lines are the same length
-       //first line
-       if(lineLength == 0){
-           lineLength = line.count(",");
-       }
-       else{
-           //line is not the same length as the last line
-           if(lineLength!=line.count(",")){
-               //failed
-               return false;
-           }
-       }
+        //check all lines are the same length
+        //first line
+        if(lineLength == 0){
+            lineLength = line.count(",");
+        }
+        else{
+            //line is not the same length as the last line
+            if(lineLength!=line.count(",")){
+                //failed
+                return false;
+            }
+        }
 
 
-       //checks if the current line contains anything but numbers and commas
-       QRegExp r("^-?[0-9](,-?[0-9])*$");
-       if(line.contains(r)){
+        //checks if the current line contains anything but numbers and commas
+        QRegExp r("^-?[0-9](,-?[0-9])*$");
+        if(line.contains(r)){
 
-       }
-       else{
-           //failed
-           return false;
-       }
+        }
+        else{
+            //failed
+            return false;
+        }
     }
 
 
-//made it to the end of testing
-return true;
+    //made it to the end of testing
+    return true;
 }
 
 
@@ -555,7 +555,7 @@ void MainWindow::menuRequest(QPoint pos)
     // Retrieving the row and column of the mouse click on the grid
     QModelIndex index = ui->tableView->indexAt(pos);
     // If the cell is a blank cell (excludes sum cells, grey cells)
-    if (board[index.row()][index.column()] == 0) {
+    if (board[index.row()][index.column()] >= 0 && board[index.row()][index.colum()] <= 10) {
         // Create a menu item
         QMenu menu(this);
         // Create actions for the menu
@@ -584,31 +584,29 @@ void MainWindow::menuRequest(QPoint pos)
         // Action that was clicked on
         QAction *action = menu.exec(ui->tableView->viewport()->mapToGlobal(pos));
 
-        if (!action) {
-            // User didn't press any QAction
-            // Close the menu
-        } else {
-        // If it is a set action
-        if (action->text().contains("Set value to ")) {
-            // Create a new cell with the selected number
-            cell = new QStandardItem(action->text().right(1));
-            // Update the board with the selected number
-            board[index.row()][index.column()] = action->text().right(1).toInt();
-            // Change the font size
-            f.setPointSize(30);
-        // If it was clearValue action
-        } else if (action->text().contains("Clear")) {
-            // Create a cell with the default string for blank cell
-            cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
-            // Update the cell in the board vector
-            board[index.row()][index.column()] = 0;
-            // Change the font size
-            f.setPointSize(9);
+        // Making sure the user selects a QAction
+        if (action) {
+            // If it is a set action
+            if (action->text().contains("Set value to ")) {
+                // Create a new cell with the selected number
+                cell = new QStandardItem(action->text().right(1));
+                // Update the board with the selected number
+                board[index.row()][index.column()] = action->text().right(1).toInt();
+                // Change the font size
+                f.setPointSize(30);
+                // If it was clearValue action
+            } else if (action->text().contains("Clear")) {
+                // Create a cell with the default string for blank cell
+                cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
+                // Update the cell in the board vector
+                board[index.row()][index.column()] = 0;
+                // Change the font size
+                f.setPointSize(9);
+            }
+            // Set font and alignment of the cell and set it to the model
+            cell->setFont(f);
+            cell->setTextAlignment(Qt::AlignCenter);
+            model->setItem(index.row(), index.column(), cell);
         }
-        // Set font and alignment of the cell and set it to the model
-        cell->setFont(f);
-        cell->setTextAlignment(Qt::AlignCenter);
-        model->setItem(index.row(), index.column(), cell);
-    }
     }
 }
