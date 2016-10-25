@@ -346,9 +346,11 @@ void MainWindow::populateBoardFromFile(){
     //opens a dialog box for the user to select a file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("Text Files (*.txt)"));
 
-    //opens the file
+    // Loads the file
     QFile file(fileName);
+    file.open(QIODevice::ReadWrite);
 
+    if (file.isReadable()) {
     //calls the validateFile function
     if (validateFile(&file) == false){
         //if it fails to validate,
@@ -429,7 +431,7 @@ void MainWindow::populateBoardFromFile(){
         }
     }
     drawBoard();
-
+	}
 }
 
 
