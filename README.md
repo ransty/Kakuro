@@ -1,6 +1,7 @@
 TODO:
 
 1. Get rid of random.
+1.a) Remove QAction items, use menu.
 2. Save and load files using both vectors
 3. Add a few already generated, valid boards.
 4. Only show possible choices - making sure to adhere to both parts 3 and 4 of the minimal program list
