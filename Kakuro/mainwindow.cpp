@@ -67,8 +67,6 @@ MainWindow::MainWindow(QWidget	*parent):
     ui->boardSize->addItem("5x5");
     ui->boardSize->addItem("9x8");
     ui->boardSize->addItem("15x15");
-
-
 }
 
 MainWindow::~MainWindow()
@@ -624,28 +622,11 @@ void MainWindow::menuRequest(QPoint pos)
 	    if (board[index.row()][index.column()] >= 0 && board[index.row()][index.column()] <= 10) {
         	// Create a menu item
 	        QMenu menu(this);
-	        // Create actions for the menu
-        	QAction *clearValue;
-	        QAction *setValue1;
-	        QAction *setValue2;
-	        QAction *setValue3;
-	        QAction *setValue4;
-	        QAction *setValue5;
-	        QAction *setValue6;
-	        QAction *setValue7;
-	        QAction *setValue8;
-        	QAction *setValue9;
 	        // Set text for the action and add them to the menu
-        	clearValue = menu.addAction("Clear set value");
-	        setValue1 = menu.addAction("Set value to 1");
-	        setValue2 = menu.addAction("Set value to 2");
-	        setValue3 = menu.addAction("Set value to 3");
-	        setValue4 = menu.addAction("Set value to 4");
-	        setValue5 = menu.addAction("Set value to 5");
-	        setValue6 = menu.addAction("Set value to 6");
-	        setValue7 = menu.addAction("Set value to 7");
-        	setValue8 = menu.addAction("Set value to 8");
-	        setValue9 = menu.addAction("Set value to 9");
+            menu.addAction("Clear set value");
+
+            // Add actions to enter values: 1-9
+            for (int i = 1; i <= 9; i++) {menu.addAction("Set value to " + QString::number(i));}
 	
 	        // Action that was clicked on
 	        QAction *action = menu.exec(ui->tableView->viewport()->mapToGlobal(pos));
