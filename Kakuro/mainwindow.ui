@@ -189,12 +189,15 @@
       <item>
        <widget class="QPushButton" name="RandomNumbers">
         <property name="text">
-         <string>Generate Random Board</string>
+         <string>Generate Board</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="heightLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Height</string>
         </property>
@@ -202,16 +205,28 @@
       </item>
       <item>
        <widget class="QSpinBox" name="heightSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
          <number>3</number>
         </property>
         <property name="maximum">
          <number>15</number>
         </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>3</number>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="widthLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Width</string>
         </property>
@@ -219,11 +234,30 @@
       </item>
       <item>
        <widget class="QSpinBox" name="widthSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimum">
          <number>3</number>
         </property>
         <property name="maximum">
          <number>15</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>3</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="boardSize">
+        <property name="currentText">
+         <string/>
+        </property>
+        <property name="maxVisibleItems">
+         <number>3</number>
         </property>
        </widget>
       </item>

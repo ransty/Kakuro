@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget	*parent):
     ui(new Ui::MainWindow)
 {
     // srand used to create random numbers
-    srand(time(NULL));
+    //srand(time(NULL));
 
     ui->setupUi(this);
     // Linking mouse click to slot menuRequest
@@ -62,6 +62,12 @@ MainWindow::MainWindow(QWidget	*parent):
     connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(menuRequest(QPoint)));
     // Disable editing text using keyboard in the table
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    //Add items to the boardSize combo box
+    ui->boardSize->addItem("Board Size");
+    ui->boardSize->addItem("5x5");
+    ui->boardSize->addItem("9x8");
+    ui->boardSize->addItem("15x15");
+
 
 }
 
@@ -161,18 +167,62 @@ void MainWindow::drawBoard(){
 void MainWindow::setBoardSize(int height, int width){
     // Empty the boards, this is needed if the generate button is pressed multiple times
     board = {};
-    boardSolution = {};
+    // 3 Different board sizes
+    if (height == 5){
+        boardSolution = {
+                {-2,-2,100,290,-2},
+                {-2,6170,1,5,30},
+                {22000,9,3,8,2},
+                {18000,8,2,7,1},
+                {-2,13000,4,9,-2} };
+
+    }
+    else if (height == 9){
+        boardSolution = {
+                {-2,-2,260,80,-2,210,140,-2},
+                {-2,11000,9,2,16040,7,9,-2},
+                {-2,17030,1,6,3,2,5,-2},
+                {9000,2,7,10000,1,9,160,-2},
+                {6000,1,5,220,4000,3,1,160},
+                {-2,12000,4,8,110,12000,3,9},
+                {-2,-2,15130,6,9,9110,2,7},
+                {-2,21000,5,1,2,9,4,-2},
+                {-2,15000,8,7,8000,2,6,-2} };
+
+    }
+    else if (height == 15){
+        boardSolution = {
+                {-2,-2,40,60,-2,-2,-2,-2,70,160,-2,60,300,-2,-2},
+                {-2,4000,1,3,160,-2,-2,8230,1,7,8040,1,7,-2,-2},
+                {-2,14000,3,2,9,240,32000,6,4,9,3,2,8,-2,-2},
+                {-2,-2,16000,1,7,8,10040,8,2,13000,1,3,9,40,30},
+                {-2,-2,-2,-2,19290,7,3,9,160,160,-2,9000,6,1,2},
+                {-2,-2,40,15160,5,9,1,9350,2,7,170,-2,4000,3,1},
+                {-2,18000,3,7,8,-2,27000,7,3,9,8,100,-2,-2,-2},
+                {-2,17000,1,9,7,30,10000,9,1,11000,9,2,40,160,-2},
+                {-2,-2,-2,11000,9,2,14030,8,6,-2,13000,1,3,9,-2},
+                {-2,30,160,-2,12000,1,2,5,4,170,12060,4,1,7,-2},
+                {8000,1,7,100,-2,7000,1,6,12240,8,1,3,-2,-2,-2},
+                {14000,2,9,3,60,160,-2,20230,8,9,3,40,240,-2,-2},
+                {-2,-2,10000,2,1,7,15030,6,9,13000,2,3,8,40,-2},
+                {-2,-2,30000,1,3,9,2,8,7,-2,11000,1,7,3,-2},
+                {-2,-2,6000,4,2,10000,1,9,-2,-2,-2,10000,9,1,-2} };
+
+
+    }
 
     //pretty simple,
     //just sets the size of the multidimentional array
     board.resize(height);
-    boardSolution.resize(height);
+    //boardSolution.resize(height);
     for(int i = 0; i<height; i++){
         board[i].resize(width);
-        boardSolution[i].resize(width);
+        //boardSolution[i].resize(width);
     }
 }
 
+
+/*
 //populates the board with random numbers
 void MainWindow::populateBoardRandom(){
 
@@ -190,11 +240,14 @@ void MainWindow::populateBoardRandom(){
         }
     }
 }
+*/
+
 
 /**
  * @brief MainWindow::populateAnswerCells sums up the horizontal and vertical sums
  *  and updates the boardSolution vector to contain the sums
  */
+/*
 void MainWindow::populateAnswerCells() {
 
     //loops through each row
@@ -257,7 +310,9 @@ void MainWindow::populateAnswerCells() {
         }
     }
 }
+*/
 
+/*
 void MainWindow::createRandomLayout(){
     //unimplemented at the moment
 
@@ -318,6 +373,7 @@ void MainWindow::createRandomLayout(){
     }
 
 }
+*/
 
 void MainWindow::createBlankBoardFromSolution(){
     // this is where we copy all the grey cells and answer cells from boardSolution to board
@@ -329,7 +385,7 @@ void MainWindow::createBlankBoardFromSolution(){
             if(boardSolution[i][j] == -2){
                 board[i][j] = -2;
             }
-            else if(boardSolution[i][j] >= 100){
+            else if(boardSolution[i][j] >= 10){
                 board[i][j] = boardSolution[i][j];
             }
             else{
@@ -479,20 +535,29 @@ bool MainWindow::validateFile(QFile* file){
 
 void MainWindow::on_RandomNumbers_clicked()
 {
-    //set up size of array
-    setBoardSize(ui->heightSpinBox->value(), ui->widthSpinBox->value());
-    //create random layout
-    createRandomLayout();
-    //populates the boardSolution vector
-    populateBoardRandom();
-    //Adds up the horizontal and vertical sums
-    populateAnswerCells();
-    //populates the board vector
-    createBlankBoardFromSolution();
-    //calculate solutions
-    //calculateSolutions();
-    //draws the board to the screen
-    drawBoard();
+    //get text from the combo box
+    QString size = ui->boardSize->currentText();
+    //check if the user has acutally selected the size
+    if (size != "Board Size"){
+        //set up size of array
+        int height = size.left(size.indexOf("x")).toInt(); //get the height of the board
+        int width = size.right(size.indexOf("x")).toInt(); //get the width of the board
+        setBoardSize(height, width); //initialise the board
+
+        //create random layout
+        //createRandomLayout();
+        //populates the boardSolution vector
+        //populateBoardRandom();
+        //Adds up the horizontal and vertical sums
+        //populateAnswerCells();
+
+        //populates the board vector
+        createBlankBoardFromSolution();
+        //calculate solutions
+        //calculateSolutions();
+        //draws the board to the screen
+        drawBoard();
+    }
 
 }
 
