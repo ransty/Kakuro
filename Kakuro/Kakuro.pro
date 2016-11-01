@@ -15,8 +15,10 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    usermove.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    usermove.h
 
 FORMS    += mainwindow.ui

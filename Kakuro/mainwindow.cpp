@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "userMove.h"
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QFont>
@@ -15,6 +16,8 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <sstream>
+#include <qdebug.h>
+
 
 
 
@@ -42,6 +45,8 @@ std::vector<std::vector<double>> board;
 //boardSolution contains the numbers that are needed to solve the board
 //these numbers are never visible to the user
 std::vector<std::vector<double>> boardSolution;
+
+std::vector<userMove> moves;
 
 //the board layout
 QStandardItemModel *model;
@@ -150,7 +155,7 @@ void MainWindow::drawBoard(){
             model->setItem(i, j, cell);
 
             // Prints out the solution FOR TESTING PURPOSES
-            std::cout << boardSolution[i][j] << ", " << std::flush;
+            std::cout << board[i][j] << ", " << std::flush;
         }
         std::cout << std::endl;
     }
@@ -164,57 +169,59 @@ void MainWindow::drawBoard(){
  */
 void MainWindow::setBoardSize(int height, int width){
     // Empty the boards, this is needed if the generate button is pressed multiple times
-    board = {};
+    //board = {};
     // 3 Different board sizes
-    if (height == 5){
-        boardSolution = {
-                {-2,-2,100,290,-2},
-                {-2,6170,1,5,30},
-                {22000,9,3,8,2},
-                {18000,8,2,7,1},
-                {-2,13000,4,9,-2} };
+//    if (height == 5){
+//        boardSolution = {
+//                {-2,-2,100,290,-2},
+//                {-2,6170,1,5,30},
+//                {22000,9,3,8,2},
+//                {18000,8,2,7,1},
+//                {-2,13000,4,9,-2} };
 
-    }
-    else if (height == 9){
-        boardSolution = {
-                {-2,-2,260,80,-2,210,140,-2},
-                {-2,11000,9,2,16040,7,9,-2},
-                {-2,17030,1,6,3,2,5,-2},
-                {9000,2,7,10000,1,9,160,-2},
-                {6000,1,5,220,4000,3,1,160},
-                {-2,12000,4,8,110,12000,3,9},
-                {-2,-2,15130,6,9,9110,2,7},
-                {-2,21000,5,1,2,9,4,-2},
-                {-2,15000,8,7,8000,2,6,-2} };
+//    }
+//    else if (height == 9){
+//        boardSolution = {
+//                {-2,-2,260,80,-2,210,140,-2},
+//                {-2,11000,9,2,16040,7,9,-2},
+//                {-2,17030,1,6,3,2,5,-2},
+//                {9000,2,7,10000,1,9,160,-2},
+//                {6000,1,5,220,4000,3,1,160},
+//                {-2,12000,4,8,110,12000,3,9},
+//                {-2,-2,15130,6,9,9110,2,7},
+//                {-2,21000,5,1,2,9,4,-2},
+//                {-2,15000,8,7,8000,2,6,-2} };
 
-    }
-    else if (height == 15){
-        boardSolution = {
-                {-2,-2,40,60,-2,-2,-2,-2,70,160,-2,60,300,-2,-2},
-                {-2,4000,1,3,160,-2,-2,8230,1,7,8040,1,7,-2,-2},
-                {-2,14000,3,2,9,240,32000,6,4,9,3,2,8,-2,-2},
-                {-2,-2,16000,1,7,8,10040,8,2,13000,1,3,9,40,30},
-                {-2,-2,-2,-2,19290,7,3,9,160,160,-2,9000,6,1,2},
-                {-2,-2,40,15160,5,9,1,9350,2,7,170,-2,4000,3,1},
-                {-2,18000,3,7,8,-2,27000,7,3,9,8,100,-2,-2,-2},
-                {-2,17000,1,9,7,30,10000,9,1,11000,9,2,40,160,-2},
-                {-2,-2,-2,11000,9,2,14030,8,6,-2,13000,1,3,9,-2},
-                {-2,30,160,-2,12000,1,2,5,4,170,12060,4,1,7,-2},
-                {8000,1,7,100,-2,7000,1,6,12240,8,1,3,-2,-2,-2},
-                {14000,2,9,3,60,160,-2,20230,8,9,3,40,240,-2,-2},
-                {-2,-2,10000,2,1,7,15030,6,9,13000,2,3,8,40,-2},
-                {-2,-2,30000,1,3,9,2,8,7,-2,11000,1,7,3,-2},
-                {-2,-2,6000,4,2,10000,1,9,-2,-2,-2,10000,9,1,-2} };
+//    }
+//    else if (height == 15){
+//        boardSolution = {
+//                {-2,-2,40,60,-2,-2,-2,-2,70,160,-2,60,300,-2,-2},
+//                {-2,4000,1,3,160,-2,-2,8230,1,7,8040,1,7,-2,-2},
+//                {-2,14000,3,2,9,240,32000,6,4,9,3,2,8,-2,-2},
+//                {-2,-2,16000,1,7,8,10040,8,2,13000,1,3,9,40,30},
+//                {-2,-2,-2,-2,19290,7,3,9,160,160,-2,9000,6,1,2},
+//                {-2,-2,40,15160,5,9,1,9350,2,7,170,-2,4000,3,1},
+//                {-2,18000,3,7,8,-2,27000,7,3,9,8,100,-2,-2,-2},
+//                {-2,17000,1,9,7,30,10000,9,1,11000,9,2,40,160,-2},
+//                {-2,-2,-2,11000,9,2,14030,8,6,-2,13000,1,3,9,-2},
+//                {-2,30,160,-2,12000,1,2,5,4,170,12060,4,1,7,-2},
+//                {8000,1,7,100,-2,7000,1,6,12240,8,1,3,-2,-2,-2},
+//                {14000,2,9,3,60,160,-2,20230,8,9,3,40,240,-2,-2},
+//                {-2,-2,10000,2,1,7,15030,6,9,13000,2,3,8,40,-2},
+//                {-2,-2,30000,1,3,9,2,8,7,-2,11000,1,7,3,-2},
+//                {-2,-2,6000,4,2,10000,1,9,-2,-2,-2,10000,9,1,-2} };
 
 
-    }
+//    }
 
     //pretty simple,
     //just sets the size of the multidimentional array
     board.resize(height);
+    boardSolution.resize(height);
     //boardSolution.resize(height);
     for(int i = 0; i<height; i++){
         board[i].resize(width);
+        boardSolution[i].resize(width);
         //boardSolution[i].resize(width);
     }
 }
@@ -397,6 +404,9 @@ void MainWindow::createBlankBoardFromSolution(){
 //populates the board from a file
 void MainWindow::populateBoardFromFile(){
 
+    //CURRENTLY ASSUME FILE IS VALID
+    //OLD VALIDATION CODE BELOW
+
     //opens a dialog box for the user to select a file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("Text Files (*.txt)"));
 
@@ -404,6 +414,140 @@ void MainWindow::populateBoardFromFile(){
     QFile file(fileName);
     file.open(QIODevice::ReadWrite);
 
+    //sets the file back to the first character
+    file.seek(0);
+
+    QTextStream in(&file);
+
+
+    //reads the whole file into a stringstream
+    std::stringstream ss(in.readAll().toStdString());
+    std::string token;
+
+    //strings to hold each part of the file
+    std::string sizeString;
+    QString boardSolutionString;
+    QString boardString;
+    std::string movesString;
+
+    int loopNumber = 0;
+    //splits the file into the 4 vectors
+    while(getline(ss, token, '*')){
+        if(loopNumber == 0){
+            sizeString = token;}
+        else if(loopNumber == 1){
+            boardSolutionString = QString::fromStdString(token);
+        }
+        else if(loopNumber == 2){
+            boardString = QString::fromStdString(token);
+        }
+        else{
+            movesString = token;
+        }
+
+        loopNumber++;
+    }
+
+
+    /////////////////////////
+    //start sorting of size//
+    /////////////////////////
+
+    std::vector<std::string> sizeVector;
+    std::stringstream sizeSs(sizeString);
+    std::string sizeToken;
+    while(getline(sizeSs, sizeToken, ',')){
+        sizeVector.push_back(sizeToken);
+    }
+
+
+    //sets the board size to the data in the first vector
+    setBoardSize(std::atoi(sizeVector[0].data()),std::atoi(sizeVector[1].data()));
+
+    ////////////////////////////
+    //finished sorting of size//
+    ////////////////////////////
+
+
+    //////////////////////////////////
+    //start sorting of boardSolution//
+    //////////////////////////////////
+    QTextStream boardSolutionStream(&boardSolutionString);
+
+    int boardSolutionColumn = 0;
+    int boardSolutionLine = 0;
+
+    while (!boardSolutionStream.atEnd()) {
+        //reads the nect line
+        QString line = boardSolutionStream.readLine();
+
+
+        //splits the line up again
+        std::stringstream boardSolutionSs(line.toStdString());
+        std::string boardSolutionToken;
+        while (getline(boardSolutionSs,boardSolutionToken, ','))
+        {
+
+            //actually enters the data into the arrays now
+            //have no idea why I need to do lineNumber - 1
+            boardSolution[boardSolutionLine-1][boardSolutionColumn] = QString::fromStdString(boardSolutionToken).toDouble();
+            boardSolutionColumn++;
+        }
+        boardSolutionColumn = 0;
+        boardSolutionLine++;
+    }
+
+    /////////////////////////////////////
+    //finished sorting of boardSolution//
+    /////////////////////////////////////
+
+    //////////////////////////
+    //start sorting of board//
+    //////////////////////////
+    QTextStream boardStream(&boardString);
+
+    int columnNumber = 0;
+    int lineNumber = 0;
+
+    while (!boardStream.atEnd()) {
+        //reads the nect line
+        QString line = boardStream.readLine();
+
+
+        //splits the line up again
+        std::stringstream boardSs(line.toStdString());
+        std::string boardToken;
+        while (getline(boardSs,boardToken, ','))
+        {
+
+            //actually enters the data into the arrays now
+            //have no idea why I need to do lineNumber - 1
+            board[lineNumber-1][columnNumber] = QString::fromStdString(boardToken).toDouble();
+            columnNumber++;
+        }
+        columnNumber = 0;
+        lineNumber++;
+    }
+
+    /////////////////////////////
+    //finished sorting of board//
+    /////////////////////////////
+
+
+    //////////////////////////
+    //start sorting of moves//
+    //////////////////////////
+
+    //move code goes here
+
+    /////////////////////////////
+    //finished sorting of moves//
+    /////////////////////////////
+
+    drawBoard();
+
+
+    /*
     if (file.isReadable()) {
     //calls the validateFile function
     if (validateFile(&file) == false){
@@ -486,6 +630,7 @@ void MainWindow::populateBoardFromFile(){
     }
     drawBoard();
 	}
+    */
 }
 
 
@@ -660,3 +805,14 @@ void MainWindow::menuRequest(QPoint pos)
 	}
     }
 }
+
+
+//needs to return a string as follows:
+//{1,1,1,1},{2,2,2,2},{5,1,5,6}
+//i.e.
+//{moves[0].toString()},{moves[1].toString()},{moves[2].toString()}
+std::string MainWindow::movesToString(){
+
+
+}
+

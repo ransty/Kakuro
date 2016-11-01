@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QFile>
 #include <QPoint>
+#include "usermove.h"
 
 namespace Ui {
 class MainWindow;
@@ -35,6 +36,8 @@ private:
     bool validateFile(QFile*);
     std::vector<std::vector<double>> board;
     std::vector<std::vector<double>> boardSolution;
+    std::vector<userMove> moves;
+    std::string movesToString();
 };
 
 #endif // MAINWINDOW_H
