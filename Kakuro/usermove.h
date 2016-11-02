@@ -13,7 +13,6 @@ public:
     int getOldValue();
     int getNewValue();
     std::string toString();
-    friend std::ostream& operator<<( std::ostream& out, const userMove& moves );
 private:
     int x;
     int y;

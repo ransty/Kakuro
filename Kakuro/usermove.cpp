@@ -5,8 +5,12 @@ userMove::userMove()
 
 }
 
+/**
+ * Destructor
+ * @brief userMove::~userMove
+ */
 userMove::~userMove() {
-
+    // nothing to delete, no pointers
 }
 
 userMove::userMove(int x, int y, int oldValue, int newValue){
@@ -32,9 +36,10 @@ int userMove::getY(){
     return y;
 }
 
-
-//this needs to output as so:
-//"{x=5,y=4,o=1,n=6}"
+/**
+ * @brief userMove::toString
+ * @return {x, y, old, new}
+ */
 std::string userMove::toString(){
     std::string rString = "{x=" + std::to_string(getX()) + ", y=" + std::to_string(getY()) + ", o=" +
                                  std::to_string(getOldValue()) + ", n=" + std::to_string(getNewValue()) + "}";
