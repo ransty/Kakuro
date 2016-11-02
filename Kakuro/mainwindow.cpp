@@ -820,7 +820,6 @@ void MainWindow::saveBoard() {
         // Seperate board from moves by *
         out << "*\n";
 
-
         // Now print the moves
         for (auto i : moves) {
             out << i.toString();
@@ -896,7 +895,7 @@ void MainWindow::menuRequest(QPoint pos)
 QString MainWindow::movesToString(){
     QString rString = "";
     for(auto i : moves) {
-        rString += i.toString() + ", ";
+        rString += i.toString() + ",";
     }
     rString = rString.left(rString.length()-2);
     return rString + "\n";
