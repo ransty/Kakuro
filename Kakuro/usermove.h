@@ -9,14 +9,14 @@ public:
     userMove();
     ~userMove();
     userMove(int, int, int, int);
-    int getX();
-    int getY();
+    int getRow();
+    int getColumn();
     int getOldValue();
     int getNewValue();
     QString toString();
 private:
-    int x;
-    int y;
+    int row;
+    int column;
     int oldValue;
     int newValue;
 

@@ -24,6 +24,10 @@ private slots:
     void on_loadFileButton_clicked();
     void menuRequest(QPoint pos);
 
+    void on_undoButton_clicked();
+
+    void on_replaySolutionButton_clicked();
+
 private:
     void printMyMoves();
     Ui::MainWindow *ui;
@@ -40,10 +44,14 @@ private:
     bool checkSection(int sum, int y, int x, int yDelta, int xDelta);
     bool checkPuzzle();
     void puzzleSolved();
+    void undoMove();
+    void replaySolution();
     std::vector<std::vector<double>> board;
     std::vector<std::vector<double>> boardSolution;
     std::vector<userMove> moves;
     QString movesToString();
+    bool showingSolution;
+
 };
 
 #endif // MAINWINDOW_H

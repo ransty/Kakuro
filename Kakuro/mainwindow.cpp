@@ -9,6 +9,7 @@
 #include <string>
 #include <fstream>
 #include <QBrush>
+#include <QTime>
 #include <QColor>
 #include <stdio.h>
 #include <math.h>
@@ -75,6 +76,8 @@ MainWindow::MainWindow(QWidget	*parent):
     ui->boardSize->addItem("5x5");
     ui->boardSize->addItem("9x8");
     ui->boardSize->addItem("15x15");
+
+    showingSolution = false;
 }
 
 MainWindow::~MainWindow()
@@ -541,49 +544,56 @@ void MainWindow::populateBoardFromFile(){
     //start sorting of moves//
     //////////////////////////
 
-    // First we need to have the movesString as a stream
-    std::stringstream moveStream(movesString);
-    // Now we need a iterator
-    std::string moveIterator;
-    std::queue<int> moveQueue;
+    //need to clear the current move board
+    moves.clear();
 
-    do {
-        // Now we need to get the move object
-        // First we need to get rid of {, } and \n
-        if (moveIterator.size() > 1) { // works but there has to be a more efficient way (TODO)
-            moveIterator.erase(std::remove(moveIterator.begin(), moveIterator.end(), '\n'), moveIterator.end());
-            moveIterator.erase(std::remove(moveIterator.begin(), moveIterator.end(), '{'), moveIterator.end());
-            moveIterator.erase(std::remove(moveIterator.begin(), moveIterator.end(), '}'), moveIterator.end());
-        }
-        // Now push onto the queue
-        // i.e. Move set is {1, 2, 3, 4}
-        // Queue should be 1 2 3 4
+    //does our normal looping through a string and stopping at each ,
+    std::stringstream moveSs(movesString);
+    std::string moveToken;
 
-        // Convert to integer
-        int queueMove = atoi(moveIterator.c_str());
-        if ( moveQueue.size() != 4 ) {
-            moveQueue.push(queueMove);
-        } else {
-            // Time to pop off the queue and add to a new move
-            // Queue order should be, {x. y. o, n}
-            int newVal = moveQueue.front();
-            moveQueue.pop();
-            int oldVal = moveQueue.front();
-            moveQueue.pop();
-            int y = moveQueue.front();
-            moveQueue.pop();
-            int x = moveQueue.front();
-            // Gotta empty it
-            moveQueue.pop();
-            // Now we can put it on the queue
-            moveQueue.push(queueMove);
-            // Now create userMove
-            userMove myMove(x, y, oldVal, newVal);
+    //need this test to remove whitespace line
+    while (getline(moveSs,moveToken, '{'))
+    {
+        //checks if the line is valid
+        if(moveToken.find('}') == 7){
+            //gets the values in the format 1,1,1,1
+            moveToken = moveToken.substr(0, 7);
+
+
+            //variables to store the data in
+            int rowTemp;
+            int columnTemp;
+            int oldTemp;
+            int newTemp;
+
+            //counter to know which value it is up to
+            int count = 0;
+
+            //splits the string into individual integers
+            std::stringstream boardSs2(moveToken);
+            std::string boardToken2;
+            while (getline(boardSs2,boardToken2, ','))
+            {
+                //puts the current value into the correct temp integer
+                if(count==0)
+                    rowTemp = std::atoi(boardToken2.c_str());
+                else if(count==1)
+                    columnTemp = std::atoi(boardToken2.c_str());
+                else if(count==2)
+                    oldTemp = std::atoi(boardToken2.c_str());
+                else
+                    newTemp = std::atoi(boardToken2.c_str());
+                count++;
+            }
+
+            //Now create userMove
+            userMove myMove(rowTemp, columnTemp, oldTemp, newTemp);
             // Push the move
             moves.push_back(myMove);
-
         }
-    } while(getline(moveStream, moveIterator, ','));
+
+
+    }
 
     /////////////////////////////
     //finished sorting of moves//
@@ -883,6 +893,8 @@ bool MainWindow::checkPuzzle(){
  * Changes the colour of the numbers to let the user know that the puzzle is solved.
  */
 void MainWindow::puzzleSolved(){
+    //sets the replay solution button to be enabled
+    ui->replaySolutionButton->setEnabled(true);
     //loop through the board vector
     for(int i = 0; i<(int) board.size(); i++){
         for(int j = 0; j<(int)board[i].size(); j++){
@@ -947,6 +959,9 @@ void MainWindow::on_loadFileButton_clicked()
 
 void MainWindow::menuRequest(QPoint pos)
 {
+    if(showingSolution==true)
+        return;
+
     // Retrieving the row and column of the mouse click on the grid
     QModelIndex index = ui->tableView->indexAt(pos);
     // Check whether index has both non negative x and y positions
@@ -968,6 +983,9 @@ void MainWindow::menuRequest(QPoint pos)
             if (action) {
                 // If it is a set action
                 if (action->text().contains("Set value to ")) {
+
+                    userMove newMove = userMove(index.row(), index.column(), board[index.row()][index.column()], action->text().right(1).toInt());
+                    moves.push_back(newMove);
                     // Create a new cell with the selected number
                     cell = new QStandardItem(action->text().right(1));
                     // Update the board with the selected number
@@ -981,6 +999,10 @@ void MainWindow::menuRequest(QPoint pos)
                     }
                 // If it was clearValue action
                 } else if (action->text().contains("Clear")) {
+
+                    userMove newMove = userMove(index.row(), index.column(), board[index.row()][index.column()], 0);
+                    moves.push_back(newMove);
+
                     // Create a cell with the default string for blank cell
                     cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
                     // Update the cell in the board vector
@@ -1014,3 +1036,68 @@ QString MainWindow::movesToString(){
     return rString + "\n";
 }
 
+
+void MainWindow::on_undoButton_clicked()
+{
+    undoMove();
+}
+
+void MainWindow::undoMove(){
+    userMove m = moves.back();
+
+    // Create a new cell with the selected number
+    cell = new QStandardItem(m.getOldValue());
+    // Update the board with the selected number
+    board[m.getRow()][m.getColumn()] = m.getOldValue();
+    // Change the font size
+    f.setPointSize(30);
+
+    cell->setFont(f);
+    cell->setTextAlignment(Qt::AlignCenter);
+    model->setItem(m.getRow(), m.getColumn(), cell);
+
+    drawBoard();
+
+    moves.pop_back();
+
+}
+
+void MainWindow::on_replaySolutionButton_clicked()
+{
+    ui->replaySolutionButton->setEnabled(false);
+    replaySolution();
+}
+
+void MainWindow::replaySolution(){
+    showingSolution = true;
+    createBlankBoardFromSolution();
+    drawBoard();
+    for(size_t i = 0; i<moves.size(); i++){
+        // Create a new cell with the selected number
+        cell = new QStandardItem(moves[i].getOldValue());
+        // Update the board with the selected number
+        board[moves[i].getRow()][moves[i].getColumn()] = moves[i].getNewValue();
+        // Change the font size
+        f.setPointSize(30);
+
+        cell->setFont(f);
+        cell->setTextAlignment(Qt::AlignCenter);
+        model->setItem(moves[i].getRow(), moves[i].getColumn(), cell);
+
+        drawBoard();
+
+        //code below is from a question asked on stack overflow
+        //http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
+        //sleeps for 1 second
+        QTime dieTime= QTime::currentTime().addSecs(1);
+        while (QTime::currentTime() < dieTime)
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+
+    }
+
+    puzzleSolved();
+
+    showingSolution = false;
+
+
+}

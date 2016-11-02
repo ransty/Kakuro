@@ -252,6 +252,23 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="replaySolutionButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Replay Solution</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="undoButton">
+        <property name="text">
+         <string>Undo</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QComboBox" name="boardSize">
         <property name="currentText">
          <string/>

@@ -14,9 +14,9 @@ userMove::~userMove() {
     // nothing to delete, no pointers
 }
 
-userMove::userMove(int x, int y, int oldValue, int newValue){
-    this->x = x;
-    this->y = y;
+userMove::userMove(int row, int column, int oldValue, int newValue){
+    this->row = row;
+    this->column = column;
     this->oldValue = oldValue;
     this->newValue = newValue;
 }
@@ -29,12 +29,12 @@ int userMove::getOldValue(){
     return oldValue;
 }
 
-int userMove::getX(){
-    return x;
+int userMove::getRow(){
+    return row;
 }
 
-int userMove::getY(){
-    return y;
+int userMove::getColumn(){
+    return column;
 }
 
 /**
@@ -42,7 +42,7 @@ int userMove::getY(){
  * @return {x, y, old, new}
  */
 QString userMove::toString(){
-    QString rString = "{" + QString::fromStdString(std::to_string(getX())) + "," + QString::fromStdString(std::to_string(getY())) + "," +
+    QString rString = "{" + QString::fromStdString(std::to_string(getRow())) + "," + QString::fromStdString(std::to_string(getColumn())) + "," +
                                  QString::fromStdString(std::to_string(getOldValue())) + "," + QString::fromStdString(std::to_string(getNewValue())) + "}";
     return rString;
 }
