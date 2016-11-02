@@ -1,6 +1,6 @@
 <h1>TODO:</h1>
 <ol>
-<li <strike>Save and load files using both vectors.</strike> Done</li>
+<li><strike>Save and load files using both vectors.</strike> Done</li>
 <li>Only show possible choices - making sure to adhere to both parts 3 and 4 of the minimal program list.</li>
 <li>Keep track of changes to the grid values using a data structure holding new objects called move.cpp. Add an undo button.</li>
 <li>Win solution. Proper checking of all sum cells to see if they are correct. Not comparing to boardSolution!</li>
