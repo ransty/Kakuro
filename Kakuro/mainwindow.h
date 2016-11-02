@@ -31,6 +31,7 @@ private:
     void setBoardSize(int, int);
     void populateBoardRandom();
     void populateAnswerCells();
+    void saveBoard();
     void createRandomLayout();
     void populateBoardFromFile();
     void createBlankBoardFromSolution();
@@ -38,7 +39,7 @@ private:
     std::vector<std::vector<double>> board;
     std::vector<std::vector<double>> boardSolution;
     std::vector<userMove> moves;
-    std::string movesToString();
+    QString movesToString();
 };
 
 #endif // MAINWINDOW_H

@@ -1,4 +1,5 @@
 #include "usermove.h"
+#include <QString>
 
 userMove::userMove()
 {
@@ -40,8 +41,8 @@ int userMove::getY(){
  * @brief userMove::toString
  * @return {x, y, old, new}
  */
-std::string userMove::toString(){
-    std::string rString = "{x=" + std::to_string(getX()) + ", y=" + std::to_string(getY()) + ", o=" +
-                                 std::to_string(getOldValue()) + ", n=" + std::to_string(getNewValue()) + "}";
+QString userMove::toString(){
+    QString rString = "{x=" + QString::fromStdString(std::to_string(getX())) + ", y=" + QString::fromStdString(std::to_string(getY())) + ", o=" +
+                                 QString::fromStdString(std::to_string(getOldValue())) + ", n=" + QString::fromStdString(std::to_string(getNewValue())) + "}";
     return rString;
 }

@@ -1,6 +1,7 @@
 #ifndef USERMOVE_H
 #define USERMOVE_H
 #include <string>
+#include <QString>
 
 class userMove
 {
@@ -12,7 +13,7 @@ public:
     int getY();
     int getOldValue();
     int getNewValue();
-    std::string toString();
+    QString toString();
 private:
     int x;
     int y;

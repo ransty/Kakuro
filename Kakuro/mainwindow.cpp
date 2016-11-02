@@ -7,6 +7,7 @@
 #include <queue>
 #include <stack>
 #include <string>
+#include <fstream>
 #include <QBrush>
 #include <QColor>
 #include <stdio.h>
@@ -584,17 +585,8 @@ void MainWindow::populateBoardFromFile(){
         }
     } while(getline(moveStream, moveIterator, ','));
 
-
-    // Prints out the inputted moves
-    // Only temp, used for debugging
-    std::cout << "Imported move set: ";
-    for(auto i : moves) {
-        std::cout << i.toString();
-    }
-    std::cout << "\n";
-
     /////////////////////////////
-    //finised sorting of moves//
+    //finished sorting of moves//
     /////////////////////////////
 
     drawBoard();
@@ -759,32 +751,58 @@ void MainWindow::on_RandomNumbers_clicked()
 
 void MainWindow::on_saveFileButton_clicked()
 {
-    //-----------------
-    //currently broken
-    //needs to save with numbers from
+    // Only fair to use
+    saveBoard();
+}
 
-    // Opens save file dialog
-    QString fileName = QFileDialog::getSaveFileName(this,tr("Save Image"), "",tr("Text Files (*.txt)"));
+void MainWindow::saveBoard() {
+    // Opens save file dialog - Fine
+    QString fileName = QFileDialog::getSaveFileName(this,tr("Save File"), "",tr("Text Files (*.txt)"));
 
-    // Check if the file name is empty
+    // Check if the file name is empty - Fine
     if(fileName.isEmpty())
         return;
     else
     {
-        // Creates the file if there was a file name
+        // Creates the file if there was a file name - fine
         QFile file(fileName);
-        // Checks if the file can be opened in write only mode
+        // Checks if the file can be opened in write only mode - Fine
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
         {
-            // Displays an error message
-            QMessageBox::information(this, tr("unable to open file"),file.errorString());
+            // Displays an error message - Fine
+            QMessageBox::information(this, tr("Unable to open file"),file.errorString());
             return;
         }
 
-        // Creates a QTextStream object to write to the file
+        // Creates a QTextStream object to write to the file - Fine
         QTextStream out(&file);
 
-        // Loops through each cell in the board array
+        //std::string filePath = fileName.toUtf8().constData();
+
+        // Save board size
+        out << board.size() << "," << board[0].size();
+
+        // Seperate size from board by *
+        out << "\n*\n";
+
+        // Now populate with answer board
+        for (int i = 0; i < boardSolution.size(); i++) {
+            for (int j = 0; j < boardSolution[i].size(); j++) {
+                // Write current value to file
+                out << boardSolution[i][j];
+
+                // Writes a comma after a value or adds a new line
+                if (j != (int)board[i].size()-1)
+                    out << ',';
+                else
+                    out << '\n';
+            }
+        }
+
+        // Seperate answer from board by *
+        out << "*\n";
+
+
         for(int i = 0; i<(int) board.size(); ++i){
             for(int j = 0; j<(int)board[i].size(); ++j)
             {
@@ -798,6 +816,16 @@ void MainWindow::on_saveFileButton_clicked()
                     out << '\n';
             }
         }
+
+        // Seperate board from moves by *
+        out << "*\n";
+
+
+        // Now print the moves
+        for (auto i : moves) {
+            out << i.toString();
+        }
+
 
         // Flushes the file and closes it
         file.flush();
@@ -865,12 +893,12 @@ void MainWindow::menuRequest(QPoint pos)
  * @brief MainWindow::movesToString
  * @return string of moves
  */
-std::string MainWindow::movesToString(){
-    std::string rString = "";
+QString MainWindow::movesToString(){
+    QString rString = "";
     for(auto i : moves) {
         rString += i.toString() + ", ";
     }
-    rString = rString.substr(0, rString.size()-2);
+    rString = rString.left(rString.length()-2);
     return rString + "\n";
 }
 
