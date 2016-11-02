@@ -42,7 +42,7 @@ int userMove::getY(){
  * @return {x, y, old, new}
  */
 QString userMove::toString(){
-    QString rString = "{x=" + QString::fromStdString(std::to_string(getX())) + ", y=" + QString::fromStdString(std::to_string(getY())) + ", o=" +
-                                 QString::fromStdString(std::to_string(getOldValue())) + ", n=" + QString::fromStdString(std::to_string(getNewValue())) + "}";
+    QString rString = QString::fromStdString(std::to_string(getX())) + "," + QString::fromStdString(std::to_string(getY())) + "," +
+                                 QString::fromStdString(std::to_string(getOldValue())) + "," + QString::fromStdString(std::to_string(getNewValue())) + "}";
     return rString;
 }
