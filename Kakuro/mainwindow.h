@@ -25,6 +25,7 @@ private slots:
     void menuRequest(QPoint pos);
 
 private:
+    void printMyMoves();
     Ui::MainWindow *ui;
     void drawBoard();
     void setBoardSize(int, int);

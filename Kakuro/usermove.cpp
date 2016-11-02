@@ -5,6 +5,10 @@ userMove::userMove()
 
 }
 
+userMove::~userMove() {
+
+}
+
 userMove::userMove(int x, int y, int oldValue, int newValue){
     this->x = x;
     this->y = y;
@@ -32,5 +36,7 @@ int userMove::getY(){
 //this needs to output as so:
 //"{x=5,y=4,o=1,n=6}"
 std::string userMove::toString(){
-    return "";
+    std::string rString = "{x=" + std::to_string(getX()) + ", y=" + std::to_string(getY()) + ", o=" +
+                                 std::to_string(getOldValue()) + ", n=" + std::to_string(getNewValue()) + "}";
+    return rString;
 }

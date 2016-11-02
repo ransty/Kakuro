@@ -6,13 +6,14 @@ class userMove
 {
 public:
     userMove();
+    ~userMove();
     userMove(int, int, int, int);
     int getX();
     int getY();
     int getOldValue();
     int getNewValue();
     std::string toString();
-
+    friend std::ostream& operator<<( std::ostream& out, const userMove& moves );
 private:
     int x;
     int y;

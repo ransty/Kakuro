@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "userMove.h"
+#include "usermove.h"
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QFont>
@@ -79,11 +79,27 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+/**
+ * THIS METHOD WILL BE DELETED LATER
+ * All this does is prints out some moves that it's given
+ * Once save/load fixed, this can be deleted
+ * Test purposes only
+ * @brief MainWindow::printMyMoves
+ */
+void MainWindow::printMyMoves() {
+    userMove myMove(1,2,3,4);
+    userMove secondMove(2,1,2,3);
+    moves.push_back(secondMove);
+    moves.push_back(myMove);
+    std::cout << "Current moves: " + movesToString();
+}
+
 //uses the board vector to draw the board to the screen
 void MainWindow::drawBoard(){
     model = new QStandardItemModel(board.size(), board[0].size(), this);
     // set the table view to the model
     ui->tableView->setModel(model);
+    printMyMoves();
     //loops through each cell in the board array
     for(int i = 0; i<(int) board.size(); i++){
         for(int j = 0; j<(int)board[i].size(); j++){
@@ -408,7 +424,7 @@ void MainWindow::populateBoardFromFile(){
     //OLD VALIDATION CODE BELOW
 
     //opens a dialog box for the user to select a file
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("Text Files (*.txt)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Text Files (*.txt)"));
 
     // Loads the file
     QFile file(fileName);
@@ -807,12 +823,17 @@ void MainWindow::menuRequest(QPoint pos)
 }
 
 
-//needs to return a string as follows:
-//{1,1,1,1},{2,2,2,2},{5,1,5,6}
-//i.e.
-//{moves[0].toString()},{moves[1].toString()},{moves[2].toString()}
+/**
+ * Returns a string in the format {x, y, old, new}
+ * @brief MainWindow::movesToString
+ * @return string of moves
+ */
 std::string MainWindow::movesToString(){
-
-
+    std::string rString = "";
+    for(auto i : moves) {
+        rString += i.toString() + ", ";
+    }
+    rString = rString.substr(0, rString.size()-2);
+    return rString + "\n";
 }
 
