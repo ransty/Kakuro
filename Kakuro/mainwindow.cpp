@@ -4,6 +4,8 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QFont>
+#include <queue>
+#include <stack>
 #include <string>
 #include <QBrush>
 #include <QColor>
@@ -79,27 +81,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/**
- * THIS METHOD WILL BE DELETED LATER
- * All this does is prints out some moves that it's given
- * Once save/load fixed, this can be deleted
- * Test purposes only
- * @brief MainWindow::printMyMoves
- */
-void MainWindow::printMyMoves() {
-    userMove myMove(1,2,3,4);
-    userMove secondMove(2,1,2,3);
-    moves.push_back(secondMove);
-    moves.push_back(myMove);
-    std::cout << "Current moves: " + movesToString();
-}
-
 //uses the board vector to draw the board to the screen
 void MainWindow::drawBoard(){
     model = new QStandardItemModel(board.size(), board[0].size(), this);
     // set the table view to the model
     ui->tableView->setModel(model);
-    printMyMoves();
     //loops through each cell in the board array
     for(int i = 0; i<(int) board.size(); i++){
         for(int j = 0; j<(int)board[i].size(); j++){
@@ -187,48 +173,48 @@ void MainWindow::setBoardSize(int height, int width){
     // Empty the boards, this is needed if the generate button is pressed multiple times
     //board = {};
     // 3 Different board sizes
-//    if (height == 5){
-//        boardSolution = {
-//                {-2,-2,100,290,-2},
-//                {-2,6170,1,5,30},
-//                {22000,9,3,8,2},
-//                {18000,8,2,7,1},
-//                {-2,13000,4,9,-2} };
+    //    if (height == 5){
+    //        boardSolution = {
+    //                {-2,-2,100,290,-2},
+    //                {-2,6170,1,5,30},
+    //                {22000,9,3,8,2},
+    //                {18000,8,2,7,1},
+    //                {-2,13000,4,9,-2} };
 
-//    }
-//    else if (height == 9){
-//        boardSolution = {
-//                {-2,-2,260,80,-2,210,140,-2},
-//                {-2,11000,9,2,16040,7,9,-2},
-//                {-2,17030,1,6,3,2,5,-2},
-//                {9000,2,7,10000,1,9,160,-2},
-//                {6000,1,5,220,4000,3,1,160},
-//                {-2,12000,4,8,110,12000,3,9},
-//                {-2,-2,15130,6,9,9110,2,7},
-//                {-2,21000,5,1,2,9,4,-2},
-//                {-2,15000,8,7,8000,2,6,-2} };
+    //    }
+    //    else if (height == 9){
+    //        boardSolution = {
+    //                {-2,-2,260,80,-2,210,140,-2},
+    //                {-2,11000,9,2,16040,7,9,-2},
+    //                {-2,17030,1,6,3,2,5,-2},
+    //                {9000,2,7,10000,1,9,160,-2},
+    //                {6000,1,5,220,4000,3,1,160},
+    //                {-2,12000,4,8,110,12000,3,9},
+    //                {-2,-2,15130,6,9,9110,2,7},
+    //                {-2,21000,5,1,2,9,4,-2},
+    //                {-2,15000,8,7,8000,2,6,-2} };
 
-//    }
-//    else if (height == 15){
-//        boardSolution = {
-//                {-2,-2,40,60,-2,-2,-2,-2,70,160,-2,60,300,-2,-2},
-//                {-2,4000,1,3,160,-2,-2,8230,1,7,8040,1,7,-2,-2},
-//                {-2,14000,3,2,9,240,32000,6,4,9,3,2,8,-2,-2},
-//                {-2,-2,16000,1,7,8,10040,8,2,13000,1,3,9,40,30},
-//                {-2,-2,-2,-2,19290,7,3,9,160,160,-2,9000,6,1,2},
-//                {-2,-2,40,15160,5,9,1,9350,2,7,170,-2,4000,3,1},
-//                {-2,18000,3,7,8,-2,27000,7,3,9,8,100,-2,-2,-2},
-//                {-2,17000,1,9,7,30,10000,9,1,11000,9,2,40,160,-2},
-//                {-2,-2,-2,11000,9,2,14030,8,6,-2,13000,1,3,9,-2},
-//                {-2,30,160,-2,12000,1,2,5,4,170,12060,4,1,7,-2},
-//                {8000,1,7,100,-2,7000,1,6,12240,8,1,3,-2,-2,-2},
-//                {14000,2,9,3,60,160,-2,20230,8,9,3,40,240,-2,-2},
-//                {-2,-2,10000,2,1,7,15030,6,9,13000,2,3,8,40,-2},
-//                {-2,-2,30000,1,3,9,2,8,7,-2,11000,1,7,3,-2},
-//                {-2,-2,6000,4,2,10000,1,9,-2,-2,-2,10000,9,1,-2} };
+    //    }
+    //    else if (height == 15){
+    //        boardSolution = {
+    //                {-2,-2,40,60,-2,-2,-2,-2,70,160,-2,60,300,-2,-2},
+    //                {-2,4000,1,3,160,-2,-2,8230,1,7,8040,1,7,-2,-2},
+    //                {-2,14000,3,2,9,240,32000,6,4,9,3,2,8,-2,-2},
+    //                {-2,-2,16000,1,7,8,10040,8,2,13000,1,3,9,40,30},
+    //                {-2,-2,-2,-2,19290,7,3,9,160,160,-2,9000,6,1,2},
+    //                {-2,-2,40,15160,5,9,1,9350,2,7,170,-2,4000,3,1},
+    //                {-2,18000,3,7,8,-2,27000,7,3,9,8,100,-2,-2,-2},
+    //                {-2,17000,1,9,7,30,10000,9,1,11000,9,2,40,160,-2},
+    //                {-2,-2,-2,11000,9,2,14030,8,6,-2,13000,1,3,9,-2},
+    //                {-2,30,160,-2,12000,1,2,5,4,170,12060,4,1,7,-2},
+    //                {8000,1,7,100,-2,7000,1,6,12240,8,1,3,-2,-2,-2},
+    //                {14000,2,9,3,60,160,-2,20230,8,9,3,40,240,-2,-2},
+    //                {-2,-2,10000,2,1,7,15030,6,9,13000,2,3,8,40,-2},
+    //                {-2,-2,30000,1,3,9,2,8,7,-2,11000,1,7,3,-2},
+    //                {-2,-2,6000,4,2,10000,1,9,-2,-2,-2,10000,9,1,-2} };
 
 
-//    }
+    //    }
 
     //pretty simple,
     //just sets the size of the multidimentional array
@@ -494,7 +480,7 @@ void MainWindow::populateBoardFromFile(){
     int boardSolutionLine = 0;
 
     while (!boardSolutionStream.atEnd()) {
-        //reads the nect line
+        //reads the next line
         QString line = boardSolutionStream.readLine();
 
 
@@ -554,10 +540,61 @@ void MainWindow::populateBoardFromFile(){
     //start sorting of moves//
     //////////////////////////
 
-    //move code goes here
+    // First we need to have the movesString as a stream
+    std::stringstream moveStream(movesString);
+    // Now we need a iterator
+    std::string moveIterator;
+    std::queue<int> moveQueue;
+
+    do {
+        // Now we need to get the move object
+        // First we need to get rid of {, } and \n
+        if (moveIterator.size() > 1) { // works but there has to be a more efficient way (TODO)
+            moveIterator.erase(std::remove(moveIterator.begin(), moveIterator.end(), '\n'), moveIterator.end());
+            moveIterator.erase(std::remove(moveIterator.begin(), moveIterator.end(), '{'), moveIterator.end());
+            moveIterator.erase(std::remove(moveIterator.begin(), moveIterator.end(), '}'), moveIterator.end());
+        }
+        // Now push onto the queue
+        // i.e. Move set is {1, 2, 3, 4}
+        // Queue should be 1 2 3 4
+
+        // Convert to integer
+        int queueMove = atoi(moveIterator.c_str());
+        if ( moveQueue.size() != 4 ) {
+            moveQueue.push(queueMove);
+        } else {
+            // Time to pop off the queue and add to a new move
+            // Queue order should be, {x. y. o, n}
+            int newVal = moveQueue.front();
+            moveQueue.pop();
+            int oldVal = moveQueue.front();
+            moveQueue.pop();
+            int y = moveQueue.front();
+            moveQueue.pop();
+            int x = moveQueue.front();
+            // Gotta empty it
+            moveQueue.pop();
+            // Now we can put it on the queue
+            moveQueue.push(queueMove);
+            // Now create userMove
+            userMove myMove(x, y, oldVal, newVal);
+            // Push the move
+            moves.push_back(myMove);
+
+        }
+    } while(getline(moveStream, moveIterator, ','));
+
+
+    // Prints out the inputted moves
+    // Only temp, used for debugging
+    std::cout << "Imported move set: ";
+    for(auto i : moves) {
+        std::cout << i.toString();
+    }
+    std::cout << "\n";
 
     /////////////////////////////
-    //finished sorting of moves//
+    //finised sorting of moves//
     /////////////////////////////
 
     drawBoard();
@@ -645,7 +682,7 @@ void MainWindow::populateBoardFromFile(){
         }
     }
     drawBoard();
-	}
+    }
     */
 }
 
@@ -777,48 +814,48 @@ void MainWindow::menuRequest(QPoint pos)
 {
     // Retrieving the row and column of the mouse click on the grid
     QModelIndex index = ui->tableView->indexAt(pos);
-	// Check whether index has both non negative x and y positions
-	if (index.isValid()) { 
-	   // If the cell is a blank cell (excludes sum cells, grey cells)
-	    if (board[index.row()][index.column()] >= 0 && board[index.row()][index.column()] <= 10) {
-        	// Create a menu item
-	        QMenu menu(this);
-	        // Set text for the action and add them to the menu
+    // Check whether index has both non negative x and y positions
+    if (index.isValid()) {
+        // If the cell is a blank cell (excludes sum cells, grey cells)
+        if (board[index.row()][index.column()] >= 0 && board[index.row()][index.column()] <= 10) {
+            // Create a menu item
+            QMenu menu(this);
+            // Set text for the action and add them to the menu
             menu.addAction("Clear set value");
 
             // Add actions to enter values: 1-9
             for (int i = 1; i <= 9; i++) {menu.addAction("Set value to " + QString::number(i));}
-	
-	        // Action that was clicked on
-	        QAction *action = menu.exec(ui->tableView->viewport()->mapToGlobal(pos));
-	
-	        // Making sure the user selects a QAction
-	        if (action) {
-	            // If it is a set action
-	            if (action->text().contains("Set value to ")) {
-	                // Create a new cell with the selected number
-	                cell = new QStandardItem(action->text().right(1));
-	                // Update the board with the selected number
-	                board[index.row()][index.column()] = action->text().right(1).toInt();
-	                // Change the font size
-	                f.setPointSize(30);
-	                // If it was clearValue action
-	            } else if (action->text().contains("Clear")) {
-	                // Create a cell with the default string for blank cell
-	                cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));	
-        	        // Update the cell in the board vector
-                	board[index.row()][index.column()] = 0;
-	                // Change the font size
-	                f.setPointSize(9);
-	            }
-	            // Set font and alignment of the cell and set it to the model
-	            cell->setFont(f);
-	            cell->setTextAlignment(Qt::AlignCenter);
-	            model->setItem(index.row(), index.column(), cell);
-	        }
-		// Now delete the action
-		delete action;
-	}
+
+            // Action that was clicked on
+            QAction *action = menu.exec(ui->tableView->viewport()->mapToGlobal(pos));
+
+            // Making sure the user selects a QAction
+            if (action) {
+                // If it is a set action
+                if (action->text().contains("Set value to ")) {
+                    // Create a new cell with the selected number
+                    cell = new QStandardItem(action->text().right(1));
+                    // Update the board with the selected number
+                    board[index.row()][index.column()] = action->text().right(1).toInt();
+                    // Change the font size
+                    f.setPointSize(30);
+                    // If it was clearValue action
+                } else if (action->text().contains("Clear")) {
+                    // Create a cell with the default string for blank cell
+                    cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
+                    // Update the cell in the board vector
+                    board[index.row()][index.column()] = 0;
+                    // Change the font size
+                    f.setPointSize(9);
+                }
+                // Set font and alignment of the cell and set it to the model
+                cell->setFont(f);
+                cell->setTextAlignment(Qt::AlignCenter);
+                model->setItem(index.row(), index.column(), cell);
+            }
+            // Now delete the action
+            delete action;
+        }
     }
 }
 
