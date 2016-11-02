@@ -27,7 +27,7 @@
 //both boards use the same number standards:
 
 //-1 = answer cell - Initially,
-//after calculations of sums, it is store in the following format
+//after calculations of sums, it is stored in the following format
 //horizontal sums are multiplied by 1000 and vertical sums are multiplied by 10 both values are added if in the same cell
 //E.g.  5000 will be horizontal sum 5
 //      160 will be vertical sum 16
@@ -227,8 +227,6 @@ void MainWindow::populateBoard(int height, int width){
                     {-2,-2,10000,2,1,7,15030,6,9,13000,2,3,8,40,-2},
                     {-2,-2,30000,1,3,9,2,8,7,-2,11000,1,7,3,-2},
                     {-2,-2,6000,4,2,10000,1,9,-2,-2,-2,10000,9,1,-2} };
-
-
         }
 }
 
@@ -680,7 +678,6 @@ void MainWindow::populateBoardFromFile(){
     */
 }
 
-
 //validates if a file is okay to be used
 bool MainWindow::validateFile(QFile* file){
     //safety check for file
@@ -720,41 +717,6 @@ bool MainWindow::validateFile(QFile* file){
 
     //made it to the end of testing
     return true;
-}
-
-
-void MainWindow::on_RandomNumbers_clicked()
-{
-    //get text from the combo box
-    QString size = ui->boardSize->currentText();
-    //check if the user has acutally selected the size
-    if (size != "Board Size"){
-        //set up size of array
-        int height = size.left(size.indexOf("x")).toInt(); //get the height of the board
-        int width = size.right(size.indexOf("x")).toInt(); //get the width of the board
-        setBoardSize(height, width); //initialise the board
-        populateBoard(height, width);
-        //create random layout
-        //createRandomLayout();
-        //populates the boardSolution vector
-        //populateBoardRandom();
-        //Adds up the horizontal and vertical sums
-        //populateAnswerCells();
-
-        //populates the board vector
-        createBlankBoardFromSolution();
-        //calculate solutions
-        //calculateSolutions();
-        //draws the board to the screen
-        drawBoard();
-    }
-
-}
-
-void MainWindow::on_saveFileButton_clicked()
-{
-    // Only fair to use
-    saveBoard();
 }
 
 void MainWindow::saveBoard() {
@@ -834,6 +796,150 @@ void MainWindow::saveBoard() {
     }
 }
 
+/**
+ * @brief MainWindow::checkSection checks a section of the puzzle to see if it adds up to the corresponding sum
+ * @param sum Vertical/Horizontal sum of the current section
+ * @param y first cell in the section
+ * @param x first cell in the section
+ * @param yDelta change in y for moving to the next cell in the section
+ * @param xDelta change in x for moving to the next cell in the section
+ * @return true if the section is correct
+ */
+bool MainWindow::checkSection(int sum, int y, int x, int yDelta, int xDelta){
+
+    // True if board[y][x] is in the current section
+    bool inSection = true;
+    int total = 0; // Total for the section
+    // Loop through the section
+    while (inSection) {
+        y = y + yDelta; // Move to the next cell vertically
+        x = x + xDelta; // Move to the next cell horizontally
+        // Check if the cell is out of bounds
+        if ((y >= (int)board.size()) || (x >= (int)board[0].size())) {
+            inSection = false;
+        // Check if the cell is blank
+        } else if (board[y][x] == 0) {
+            return false;
+        // Check if the section has come to an end
+        } else if ((board[y][x] <= 0) || (board[y][x] > 9)) {
+            inSection = false;
+        // If the cell is still within the section
+        } else {
+            total += board[y][x]; //Add the value of the cell to the total
+        }
+    }
+    // Check if the total is equal to the sum if this section
+    if (sum == total) {
+        return true;
+    }
+    return false;
+}
+
+bool MainWindow::checkPuzzle(){
+    // To store if a section is correct
+    bool correct = true;
+    // Loop through the board
+    for (int y = 0; y < (int)board.size(); y++) {
+        for (int x = 0; x < (int)board[0].size(); x++) {
+            // Check for a sum cell
+            if (board[y][x] >= 10) {
+                // Get the vertical sum
+                int vertSum = floor((int)(board[y][x]/10)%100);
+                // If there is a vertical sum
+                if (vertSum > 0) {
+                    // Check if the vertical section is correct
+                    if (!checkSection(vertSum, y, x, 1, 0)) {
+                        // If not, move out of the loop
+                        correct = false;
+                        break;
+                    }
+                }
+                // Get the horizontal sum
+                int horizSum = floor(board[y][x]/1000);
+                // If there is a horizontal sum
+                if (horizSum > 0) {
+                    // Check if the horizontal section is correct
+                    if (!checkSection(horizSum, y, x, 0, 1)) {
+                        // If not, move out of the loop
+                        correct = false;
+                        break;
+                    }
+                }
+            }
+        }
+        // If a section doesn't add up
+        if (!correct) {
+            // Move out of the loop
+            break;
+        }
+    }
+    return correct;
+
+}
+
+/**
+ * @brief MainWindow::puzzleSolved
+ * This method is called when the puzzle is solved.
+ * Changes the colour of the numbers to let the user know that the puzzle is solved.
+ */
+void MainWindow::puzzleSolved(){
+    //loop through the board vector
+    for(int i = 0; i<(int) board.size(); i++){
+        for(int j = 0; j<(int)board[i].size(); j++){
+            //change colours for cell containing 1-9 only
+            if(board[i][j]>=1 && board[i][j]<=9){
+                //new cell
+                cell = new QStandardItem(QString::number(board[i][j]));
+                f.setPointSize(30); //set the font size
+                cell->setFont(f); //set the font
+                // Set the color to dark green
+                cell->setForeground(QColor::fromRgb(0,200,0));
+                //text alignment
+                cell->setTextAlignment(Qt::AlignCenter);
+                //set the cell into the model
+                model->setItem(i, j, cell);
+
+            }
+        }
+    }
+
+
+}
+
+void MainWindow::on_RandomNumbers_clicked()
+{
+    //get text from the combo box
+    QString size = ui->boardSize->currentText();
+    //check if the user has acutally selected the size
+    if (size != "Board Size"){
+        //set up size of array
+        int height = size.left(size.indexOf("x")).toInt(); //get the height of the board
+        int width = size.right(size.indexOf("x")).toInt(); //get the width of the board
+        setBoardSize(height, width); //initialise the board
+        populateBoard(height, width);
+        //create random layout
+        //createRandomLayout();
+        //populates the boardSolution vector
+        //populateBoardRandom();
+        //Adds up the horizontal and vertical sums
+        //populateAnswerCells();
+
+        //populates the board vector
+        createBlankBoardFromSolution();
+        //calculate solutions
+        //calculateSolutions();
+        //draws the board to the screen
+        drawBoard();
+    }
+
+}
+
+void MainWindow::on_saveFileButton_clicked()
+{
+    // Only fair to use
+    saveBoard();
+}
+
 void MainWindow::on_loadFileButton_clicked()
 {
     populateBoardFromFile();
@@ -868,7 +974,12 @@ void MainWindow::menuRequest(QPoint pos)
                     board[index.row()][index.column()] = action->text().right(1).toInt();
                     // Change the font size
                     f.setPointSize(30);
-                    // If it was clearValue action
+                    // Check if the puzzle is solved
+                    if (checkPuzzle()){
+                        // if puzzle is solved
+                        puzzleSolved();
+                    }
+                // If it was clearValue action
                 } else if (action->text().contains("Clear")) {
                     // Create a cell with the default string for blank cell
                     cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
