@@ -29,6 +29,7 @@ private:
     Ui::MainWindow *ui;
     void drawBoard();
     void setBoardSize(int, int);
+    void populateBoard(int, int);
     void populateBoardRandom();
     void populateAnswerCells();
     void saveBoard();
