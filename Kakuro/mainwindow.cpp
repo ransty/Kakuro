@@ -1049,23 +1049,24 @@ void MainWindow::on_undoButton_clicked()
 }
 
 void MainWindow::undoMove(){
-    userMove m = moves.back();
+    if (moves.size() != 0) {
+        userMove m = moves.back();
 
-    // Create a new cell with the selected number
-    cell = new QStandardItem(m.getOldValue());
-    // Update the board with the selected number
-    board[m.getRow()][m.getColumn()] = m.getOldValue();
-    // Change the font size
-    f.setPointSize(30);
+        // Create a new cell with the selected number
+        cell = new QStandardItem(m.getOldValue());
+        // Update the board with the selected number
+        board[m.getRow()][m.getColumn()] = m.getOldValue();
+        // Change the font size
+        f.setPointSize(30);
 
-    cell->setFont(f);
-    cell->setTextAlignment(Qt::AlignCenter);
-    model->setItem(m.getRow(), m.getColumn(), cell);
+        cell->setFont(f);
+        cell->setTextAlignment(Qt::AlignCenter);
+        model->setItem(m.getRow(), m.getColumn(), cell);
 
-    drawBoard();
+        drawBoard();
 
-    moves.pop_back();
-
+        moves.pop_back();
+    }
 }
 
 void MainWindow::on_replaySolutionButton_clicked()
