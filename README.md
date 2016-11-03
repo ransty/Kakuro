@@ -11,14 +11,31 @@
 <li><strike>Task 6 - save moves to text file.</strike></li>
 <li><strike>Fix load game function.</strike></li>
 <li>Add redo move to save file</li>
+<li>Add random number generation to board layouts.</li>
+<li>Add another grid to the option of grids. Make it a large one (20x20?)</li>
+<li>Test that everything still works with such a large board. Try load/save/undo/redo/show solution</li>
+<li>Prepare a range of different save files for each board size. Saves that are empty, saves that are almost complete, saves that are complete.</li>
+<li>Test overwriting of files. There was a mention about this not working. Fix if need be.</li>
+<li>Try and break the program. Fix bugs that are found.</li>
+
 </ol>
 
 <h1>GRAPHICAL:</h1>
 1. Sums need to be displayed in a better way on the board. Currently the top number is for the horizontal sum and the bottom one is for vertical sums.
     - maybe put a 2x2 table in each sumCell
 2. Resize Main Window appropriately so that everything fits in.
+3. Fix the problem of displaying 1-9 on a windows PC
  
 
 <h1>OPTIONAL:</h1>
 1. Highlight cells that have only one possible value - maybe change background color to yellow
 2. Have an option to remove non-possible selections in every cell
+
+
+
+<h1>SUBMISSION:</h1>
+1. Code files.
+2. Document stating features w/ screenshots
+3. Kakuro input files.
+4. Short document about how to use the app
+5. Video of us showing the features
