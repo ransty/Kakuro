@@ -16,6 +16,7 @@
 <h1>GRAPHICAL:</h1>
 1. Sums need to be displayed in a better way on the board. Currently the top number is for the horizontal sum and the bottom one is for vertical sums.
     - maybe put a 2x2 table in each sumCell
+2. Resize Main Window appropriately so that everything fits in.
  
 
 <h1>OPTIONAL:</h1>
