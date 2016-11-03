@@ -46,6 +46,9 @@ private:
     bool checkSection(int sum, int y, int x, int yDelta, int xDelta);
     bool checkPuzzle();
     void puzzleSolved();
+    void valuesInSection(int sum, int y, int x, int yDelta, int xDelta);
+    void calculatePossibleValues();
+    void removeInvalidValues(int sum, int y, int x, int yDelta, int xDelta, std::vector<int> numsPresent);
     void undoMove();
     void redoMove();
     void replaySolution();

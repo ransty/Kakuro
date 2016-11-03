@@ -630,6 +630,7 @@ void MainWindow::populateBoardFromFile(){
         ui->redoButton;
 
     drawBoard();
+    calculatePossibleValues();
 
 
     /*
@@ -877,6 +878,7 @@ bool MainWindow::checkSection(int sum, int y, int x, int yDelta, int xDelta){
 }
 
 bool MainWindow::checkPuzzle(){
+
     // To store if a section is correct
     bool correct = true;
     // Loop through the board
@@ -937,6 +939,117 @@ void MainWindow::puzzleSolved(){
     }
 
 
+}
+
+
+/**
+ * @brief MainWindow::valuesInSection figures out what values are present in the section and calls removeInvalid Values
+ * @param sum sum of the current section
+ * @param y index of the cell
+ * @param x index of the cell
+ * @param yDelta change in y
+ * @param xDelta change in x
+ */
+void MainWindow::valuesInSection(int sum, int y, int x, int yDelta, int xDelta){
+
+    // initial x and y
+    int originy = y;
+    int originx = x;
+    std::vector <int> numsPresent = {};
+    // True if board[y][x] is in the current section
+    bool inSection = true;
+    // Loop through the section
+    while (inSection) {
+        y = y + yDelta; // Move to the next cell vertically
+        x = x + xDelta; // Move to the next cell horizontally
+        // Check if the cell is out of bounds
+        if ((y >= (int)board.size()) || (x >= (int)board[0].size())) {
+            inSection = false;
+        // Check if the section has come to an end
+        } else if ((board[y][x] < 0) || (board[y][x] > 9)) {
+            inSection = false;
+        // push 1-9 values to vector numsPresent
+        } else if (board[y][x] != 0) {
+            numsPresent.push_back(board[y][x]);
+        }
+    }
+    // Display values that are not in the grid
+    if(numsPresent.size() > 0){
+        removeInvalidValues(sum, originy, originx, yDelta, xDelta, numsPresent);
+    }
+}
+
+/**
+ * @brief MainWindow::calculatePossibleValues
+ * Loop through the board and search for sections, call valuesInSection(...) for each section
+ */
+void MainWindow::calculatePossibleValues(){
+    // Loop through the board
+    for (int y = 0; y < (int)board.size(); y++) {
+        for (int x = 0; x < (int)board[0].size(); x++) {
+            // Check for a sum cell
+            if (board[y][x] >= 10) {
+                // Get the vertical sum
+                int vertSum = floor((int)(board[y][x]/10)%100);
+                // If there is a vertical sum
+                if (vertSum > 0) {
+                    valuesInSection(vertSum, y, x, 1, 0);
+                }
+                // Get the horizontal sum
+                int horizSum = floor(board[y][x]/1000);
+                // If there is a horizontal sum
+                if (horizSum > 0) {
+                    valuesInSection(horizSum, y, x, 0, 1);
+                }
+            }
+        }
+    }
+}
+
+void MainWindow::removeInvalidValues(int sum, int y, int x, int yDelta, int xDelta, std::vector<int> numsPresent){
+    // String to display
+    QString nums = "";
+    int count = 0;
+    // Loop through 1-9
+    for (int i = 1; i <= 9; i++){
+        bool found = false;
+        // Check if i is present in the vector
+        for(int num : numsPresent){
+            if (i == num || i > sum-1){
+                found = true;
+            }
+        }
+        // If not, append i to QString nums
+        if(!found){
+            nums = nums + QString::fromStdString(std::to_string(i));
+            count++;
+            // Some formatting
+            if (i != 9){
+                if(count%3 == 0){
+                    nums += '\n';
+                } else {
+                    nums += ' ';
+                }
+            }
+        }
+    }
+
+    bool inSection = true;
+    // Loop through the section
+    while (inSection) {
+        y = y + yDelta; // Move to the next cell vertically
+        x = x + xDelta; // Move to the next cell horizontally
+        // Check if the cell is out of bounds
+        if ((y >= (int)board.size()) || (x >= (int)board[0].size())) {
+            inSection = false;
+        // Check if the cell is blank and set the possible values
+        } else if (board[y][x] == 0) {
+            model->item(y, x)->setText(nums);
+        // Check if the section has come to an end
+        } else if ((board[y][x] < 0) || (board[y][x] > 9)) {
+            inSection = false;
+        }
+    }
 }
 
 void MainWindow::on_RandomNumbers_clicked()
@@ -1052,6 +1165,7 @@ void MainWindow::menuRequest(QPoint pos)
                 else{
                     ui->replaySolutionButton->setEnabled(false);
                 }
+                calculatePossibleValues();
             }
             // Now delete the action
             delete action;
@@ -1105,6 +1219,7 @@ void MainWindow::undoMove(){
     if(moves.size() == 0){
         ui->undoButton->setEnabled(false);
     }
+    calculatePossibleValues();
 }
 
 void MainWindow::redoMove(){
@@ -1137,6 +1252,7 @@ void MainWindow::redoMove(){
         // if puzzle is solved
         puzzleSolved();
     }
+    calculatePossibleValues();
 
 }
 
@@ -1164,7 +1280,7 @@ void MainWindow::replaySolution(){
         model->setItem(moves[i].getRow(), moves[i].getColumn(), cell);
 
         drawBoard();
-
+        calculatePossibleValues();
         //code below is from a question asked on stack overflow
         //http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
         //sleeps for 1 second
