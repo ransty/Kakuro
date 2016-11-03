@@ -194,64 +194,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="heightLabel">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Height</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="heightSpinBox">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="minimum">
-         <number>3</number>
-        </property>
-        <property name="maximum">
-         <number>15</number>
-        </property>
-        <property name="singleStep">
-         <number>1</number>
-        </property>
-        <property name="value">
-         <number>3</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="widthLabel">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Width</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="widthSpinBox">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="minimum">
-         <number>3</number>
-        </property>
-        <property name="maximum">
-         <number>15</number>
-        </property>
-        <property name="singleStep">
-         <number>1</number>
-        </property>
-        <property name="value">
-         <number>3</number>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="replaySolutionButton">
         <property name="enabled">
          <bool>false</bool>
@@ -315,7 +257,7 @@
      <x>0</x>
      <y>0</y>
      <width>650</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
