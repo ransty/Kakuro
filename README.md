@@ -1,7 +1,8 @@
 <h1>TODO:</h1>
 <ol>
 <li><strike>Save and load files using both vectors.</strike> Done</li>
-<li>Only show possible choices - making sure to adhere to both parts 3 and 4 of the minimal program list.</li>
+<li><strike>Only show possible choices</strike> - making sure to adhere to both parts 3 and 4 of the minimal program list.</li>
+<li>While checking for possible choices, horizontal checking is overridding vertical checking.</li>
 <li><strike>Keep track of changes to the grid values using a data structure holding new objects called move.cpp. Store them in the vector when the user makes a change.</strike></li> 
 <li><strike>Add an undo button allowing the user to undo</strike></li>
 <li><strike>Redo move<strike></li>
