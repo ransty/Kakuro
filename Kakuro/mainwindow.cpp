@@ -741,8 +741,9 @@ void MainWindow::saveBoard() {
     // Check if the file name is empty - Fine
     if(fileName.isEmpty())
         return;
-    else
-    {
+    else if (board.size() == 0 || boardSolution.size() == 0) {
+        return;
+    } else {
         // Creates the file if there was a file name - fine
         QFile file(fileName);
         // Checks if the file can be opened in write only mode - Fine
