@@ -415,7 +415,12 @@ void MainWindow::populateBoardFromFile(){
 
     //opens a dialog box for the user to select a file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Text Files (*.txt)"));
-
+    
+    // If the file path is empty (they clicked cancel)
+    if (fileName == "") {
+        return;
+    }
+    
     // Loads the file
     QFile file(fileName);
     file.open(QIODevice::ReadWrite);
