@@ -36,7 +36,7 @@
 //Another E.g. 20220 means 20 - horizontal and 22 - vertical
 //See MainWindow::populateAnswerCell() to see how this works
 
-//-2 = grey cell
+//-2 = black cell
 
 //0 = blank cell
 
@@ -51,6 +51,8 @@ std::vector<std::vector<double>> board;
 std::vector<std::vector<double>> boardSolution;
 
 std::vector<userMove> moves;
+
+std::vector<userMove> undoMoves;
 
 //the board layout
 QStandardItemModel *model;
@@ -99,8 +101,9 @@ void MainWindow::drawBoard(){
                 //sets all formatting for an answer cell
                 f.setPointSize(9); // sets font size
                 cell = new QStandardItem();
-                QBrush brush = QBrush(QColor(Qt::blue));
+                QBrush brush = QBrush(QColor(Qt::gray));
                 cell->setBackground(brush);
+                cell->setForeground(QBrush(QColor(Qt::white)));
                 cell->setFlags(Qt::NoItemFlags);
                 QString answer = ""; // Sums will be appended here
 
@@ -138,11 +141,11 @@ void MainWindow::drawBoard(){
                 //gives the cell a number from the board vector
                 cell = new QStandardItem(QString::number(board[i][j]));
             }
-            // Grey cell
+            // Black cell
             else if(board[i][j] <= -2){
-                //sets all formatting for a grey cell
+                //sets all formatting for a black cell
                 cell = new QStandardItem();
-                QBrush brush = QBrush(QColor(Qt::gray));
+                QBrush brush = QBrush(QColor(Qt::black));
                 cell->setBackground(brush);
                 cell->setFlags(Qt::NoItemFlags);
 
@@ -165,7 +168,6 @@ void MainWindow::drawBoard(){
         }
         std::cout << std::endl;
     }
-
 }
 
 /**
@@ -190,6 +192,11 @@ void MainWindow::setBoardSize(int height, int width){
 }
 
 void MainWindow::populateBoard(int height, int width){
+    moves.clear();
+    undoMoves.clear();
+    ui->undoButton->setEnabled(false);
+    ui->redoButton->setEnabled(false);
+
      //3 Different boards
         if (height == 5 && width == 5){
             boardSolution = {
@@ -241,7 +248,7 @@ void MainWindow::populateBoardRandom(){
     for(int i = 0; i<(int)boardSolution.size(); i++){
         //loops through each column in each row
         for(int j = 0; j<(int)boardSolution[i].size(); j++){
-            // If not a grey cell or answer cell
+            // If not a black cell or answer cell
             if(boardSolution[i][j] >= 0){
                 //generate random number between 1 and 9
                 int randNum = rand()%(9-1 + 1) + 1;
@@ -269,7 +276,7 @@ void MainWindow::populateAnswerCells() {
             // for horizontal sums
             // Don't calculate sums if it is the last column
             if(j < ((int)boardSolution[i].size()-1)){
-                // Check whether the current cell is grey and the next one on the right is a blank
+                // Check whether the current cell is black and the next one on the right is a blank
                 if(boardSolution[i][j] == -2 && boardSolution[i][j+1] > 0){
                     // Index of the next blank cells
                     int colIndex = j + 1;
@@ -277,7 +284,7 @@ void MainWindow::populateAnswerCells() {
                     int colSum = 0;
                     // Set the values of the cell back to 0 (from -1)
                     boardSolution[i][j] = 0;
-                    // Loop until the cell on the right is not a grey cell
+                    // Loop until the cell on the right is not a black cell
                     while(colIndex < (int)boardSolution[i].size() && boardSolution[i][colIndex] > 0){
                         // Add the values of all the blank cells
                         colSum += boardSolution[i][colIndex];
@@ -294,7 +301,7 @@ void MainWindow::populateAnswerCells() {
             // for vertical sums
             // Don't calculate sums if it is the last row
             if(i < ((int)boardSolution.size()-1)){
-                // Check whether the current cell is grey or a cell with horizontal sum, and whether the cell below is blank
+                // Check whether the current cell is black or a cell with horizontal sum, and whether the cell below is blank
                 if((boardSolution[i][j] == -2 || boardSolution[i][j] >= 1000) && boardSolution[i+1][j] > 0){
                     if (boardSolution[i][j] == -2){
                         // If the cell is blank it will have a value of -2, so we need to make it 0 first
@@ -304,7 +311,7 @@ void MainWindow::populateAnswerCells() {
                     int rowIndex = i + 1;
                     // Sum of the row
                     int rowSum = 0;
-                    // Loop until the cell below is not a grey cell
+                    // Loop until the cell below is not a black cell
                     while(rowIndex < (int)boardSolution.size() && boardSolution[rowIndex][j] > 0){
                         // Add the values of all the blank cells below
                         rowSum += boardSolution[rowIndex][j];
@@ -327,12 +334,12 @@ void MainWindow::populateAnswerCells() {
 void MainWindow::createRandomLayout(){
     //unimplemented at the moment
 
-    //places random grey squares to start with
+    //places random black squares to start with
     //loops through each row
     for(int i = 0; i<(int)boardSolution.size(); i++){
         //loops through each column in each row
         for(int j = 0; j<(int)boardSolution[i].size(); j++){
-            // All grey for top row and left column
+            // All black for top row and left column
             if(i == 0 || j == 0){
                 board[i][j] = -2;
                 boardSolution[i][j] = -2;
@@ -352,7 +359,7 @@ void MainWindow::createRandomLayout(){
 
     //need to now make sure there are no unreachable squares
 
-    //start with squares with 0 non-grey neighbours
+    //start with squares with 0 non-black neighbours
 
     //loops through each row
     for(int i = 1; i<(int)boardSolution.size()-1; i++){
@@ -387,7 +394,7 @@ void MainWindow::createRandomLayout(){
 */
 
 void MainWindow::createBlankBoardFromSolution(){
-    // this is where we copy all the grey cells and answer cells from boardSolution to board
+    // this is where we copy all the black cells and answer cells from boardSolution to board
 
     //loops through each row
     for(int i = 0; i<(int)boardSolution.size(); i++){
@@ -560,9 +567,10 @@ void MainWindow::populateBoardFromFile(){
     while (getline(moveSs,moveToken, '{'))
     {
         //checks if the line is valid
-        if(moveToken.find('}') == 7){
+        int bracketLoc = moveToken.find('}');
+        if(bracketLoc != -1){
             //gets the values in the format 1,1,1,1
-            moveToken = moveToken.substr(0, 7);
+            moveToken = moveToken.substr(0, bracketLoc);
 
 
             //variables to store the data in
@@ -600,9 +608,26 @@ void MainWindow::populateBoardFromFile(){
 
     }
 
+    if(moves.size()!=0)
+        ui->undoButton->setEnabled(true);
+
     /////////////////////////////
     //finished sorting of moves//
     /////////////////////////////
+
+    //////////////////////////////
+    //start sorting of undomoves//
+    //////////////////////////////
+
+
+    /////////////////////////////////
+    //finished sorting of undomoves//
+    /////////////////////////////////
+
+    undoMoves.clear();
+
+    if(undoMoves.size()!=0)
+        ui->redoButton;
 
     drawBoard();
 
@@ -906,17 +931,7 @@ void MainWindow::puzzleSolved(){
         for(int j = 0; j<(int)board[i].size(); j++){
             //change colours for cell containing 1-9 only
             if(board[i][j]>=1 && board[i][j]<=9){
-                //new cell
-                cell = new QStandardItem(QString::number(board[i][j]));
-                f.setPointSize(30); //set the font size
-                cell->setFont(f); //set the font
-                // Set the color to dark green
-                cell->setForeground(QColor::fromRgb(0,200,0));
-                //text alignment
-                cell->setTextAlignment(Qt::AlignCenter);
-                //set the cell into the model
-                model->setItem(i, j, cell);
-
+                model->item(i,j)->setForeground(QColor::fromRgb(0,200,0));
             }
         }
     }
@@ -972,7 +987,7 @@ void MainWindow::menuRequest(QPoint pos)
     QModelIndex index = ui->tableView->indexAt(pos);
     // Check whether index has both non negative x and y positions
     if (index.isValid()) {
-        // If the cell is a blank cell (excludes sum cells, grey cells)
+        // If the cell is a blank cell (excludes sum cells, black cells)
         if (board[index.row()][index.column()] >= 0 && board[index.row()][index.column()] <= 10) {
             // Create a menu item
             QMenu menu(this);
@@ -992,22 +1007,30 @@ void MainWindow::menuRequest(QPoint pos)
 
                     userMove newMove = userMove(index.row(), index.column(), board[index.row()][index.column()], action->text().right(1).toInt());
                     moves.push_back(newMove);
+                    //all undos should be cleared
+                    undoMoves.clear();
+
+                    //set undo button to enabled and the redo button to disabled
+                    ui->undoButton->setEnabled(true);
+                    ui->redoButton->setEnabled(false);
+
                     // Create a new cell with the selected number
                     cell = new QStandardItem(action->text().right(1));
                     // Update the board with the selected number
                     board[index.row()][index.column()] = action->text().right(1).toInt();
                     // Change the font size
                     f.setPointSize(30);
-                    // Check if the puzzle is solved
-                    if (checkPuzzle()){
-                        // if puzzle is solved
-                        puzzleSolved();
-                    }
+
                 // If it was clearValue action
                 } else if (action->text().contains("Clear")) {
 
                     userMove newMove = userMove(index.row(), index.column(), board[index.row()][index.column()], 0);
                     moves.push_back(newMove);
+                    //all undos should be cleared
+                    undoMoves.clear();
+                    //set undo button to enabled and the redo button to disabled
+                    ui->undoButton->setEnabled(true);
+                    ui->redoButton->setEnabled(false);
 
                     // Create a cell with the default string for blank cell
                     cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
@@ -1020,6 +1043,15 @@ void MainWindow::menuRequest(QPoint pos)
                 cell->setFont(f);
                 cell->setTextAlignment(Qt::AlignCenter);
                 model->setItem(index.row(), index.column(), cell);
+
+                // Check if the puzzle is solved
+                if (checkPuzzle()){
+                    // if puzzle is solved
+                    puzzleSolved();
+                }
+                else{
+                    ui->replaySolutionButton->setEnabled(false);
+                }
             }
             // Now delete the action
             delete action;
@@ -1065,12 +1097,52 @@ void MainWindow::undoMove(){
 
         drawBoard();
 
+        undoMoves.push_back(moves.back());
         moves.pop_back();
+
+        ui->redoButton->setEnabled(true);
     }
+    if(moves.size() == 0){
+        ui->undoButton->setEnabled(false);
+    }
+}
+
+void MainWindow::redoMove(){
+    if(undoMoves.size() != 0){
+        userMove m = undoMoves.back();
+
+        // Create a new cell with the selected number
+        cell = new QStandardItem(m.getOldValue());
+        // Update the board with the selected number
+        board[m.getRow()][m.getColumn()] = m.getNewValue();
+        // Change the font size
+        f.setPointSize(30);
+
+        cell->setFont(f);
+        cell->setTextAlignment(Qt::AlignCenter);
+        model->setItem(m.getRow(), m.getColumn(), cell);
+
+        drawBoard();
+
+        moves.push_back(undoMoves.back());
+        undoMoves.pop_back();
+
+        ui->undoButton->setEnabled(true);
+
+    }
+    if(undoMoves.size() == 0){
+        ui->redoButton->setEnabled(false);
+    }
+    if (checkPuzzle()){
+        // if puzzle is solved
+        puzzleSolved();
+    }
+
 }
 
 void MainWindow::on_replaySolutionButton_clicked()
 {
+    //ui->undoButton->setEnabled(false);
     ui->replaySolutionButton->setEnabled(false);
     replaySolution();
 }
@@ -1107,4 +1179,9 @@ void MainWindow::replaySolution(){
     showingSolution = false;
 
 
+}
+
+void MainWindow::on_redoButton_clicked()
+{
+    redoMove();
 }

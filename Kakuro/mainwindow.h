@@ -28,6 +28,8 @@ private slots:
 
     void on_replaySolutionButton_clicked();
 
+    void on_redoButton_clicked();
+
 private:
     void printMyMoves();
     Ui::MainWindow *ui;
@@ -45,6 +47,7 @@ private:
     bool checkPuzzle();
     void puzzleSolved();
     void undoMove();
+    void redoMove();
     void replaySolution();
     std::vector<std::vector<double>> board;
     std::vector<std::vector<double>> boardSolution;
