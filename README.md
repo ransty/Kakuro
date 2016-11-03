@@ -2,12 +2,13 @@
 <ol>
 <li><strike>Save and load files using both vectors.</strike> Done</li>
 <li>Only show possible choices - making sure to adhere to both parts 3 and 4 of the minimal program list.</li>
-<li>Keep track of changes to the grid values using a data structure holding new objects called move.cpp. Store them in the vector when the user makes a change.</li> 
-<li>Add an undo button allowing the user to undo and redo</li>
+<li><strike>Keep track of changes to the grid values using a data structure holding new objects called move.cpp. Store them in the vector when the user makes a change.</strike></li> 
+<li><strike>Add an undo button allowing the user to undo</strike></li>
+<li>Redo move</li>
 <li><strike>Win solution. Proper checking of all sum cells to see if they are correct. Not comparing to boardSolution!</strike> Done</li>
-<li>Once win solution occurs; let the user 'replay' the way the solution was found.</li>
-<li>Task 6 - save moves to text file.</li>
-<li>Fix load game function.</li>
+<li><strike>Once win solution occurs; let the user 'replay' the way the solution was found.</strike></li>
+<li><strike>Task 6 - save moves to text file.</strike></li>
+<li><strike>Fix load game function.</strike></li>
 </ol>
 
 <h1>GRAPHICAL:</h1>
