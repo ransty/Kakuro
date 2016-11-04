@@ -172,7 +172,7 @@ void MainWindow::drawBoard(){
 
     }
     checkButtons();
-
+    calculatePossibleValues();
     int windowHeight = board.size() * 47; //get the height of the board
     int windowWidth = board[0].size() * 41; //get the width of the board
 
@@ -851,9 +851,7 @@ void MainWindow::valuesInSection(int sum, int y, int x, int yDelta, int xDelta){
         }
     }
     // Display values that are not in the grid
-    if(numsPresent.size() > 0){
-        removeInvalidValues(sum, originy, originx, yDelta, xDelta, numsPresent);
-    }
+    removeInvalidValues(sum, originy, originx, yDelta, xDelta, numsPresent);
 }
 
 /**
@@ -861,6 +859,18 @@ void MainWindow::valuesInSection(int sum, int y, int x, int yDelta, int xDelta){
  * Loop through the board and search for sections, call valuesInSection(...) for each section
  */
 void MainWindow::calculatePossibleValues(){
+    // Loop through the board and reset it back to normal
+    // This done because checking is done based on the numbers currently displaying
+    // If they are not reset, then when the user clears a number, it will display incorrect values
+    for (int y = 0; y < (int)board.size(); y++) {
+        for (int x = 0; x < (int)board[0].size(); x++) {
+            // Reset empty spaces back to normal
+            if (board[y][x] == 0){
+                model->item(y, x)->setText(QString("1 2 3\n4 5 6\n7 8 9"));
+                model->item(y, x)->setBackground(QBrush(QColor(Qt::white)));
+            }
+        }
+    }
     // Loop through the board
     for (int y = 0; y < (int)board.size(); y++) {
         for (int x = 0; x < (int)board[0].size(); x++) {
@@ -884,32 +894,6 @@ void MainWindow::calculatePossibleValues(){
 }
 
 void MainWindow::removeInvalidValues(int sum, int y, int x, int yDelta, int xDelta, std::vector<int> numsPresent){
-    // String to display
-    QString nums = "";
-    int count = 0;
-    // Loop through 1-9
-    for (int i = 1; i <= 9; i++){
-        bool found = false;
-        // Check if i is present in the vector
-        for(int num : numsPresent){
-            if (i == num || i > sum-1){
-                found = true;
-            }
-        }
-        // If not, append i to QString nums
-        if(!found){
-            nums = nums + QString::fromStdString(std::to_string(i));
-            count++;
-            // Some formatting
-            if (i != 9){
-                if(count%3 == 0){
-                    nums += '\n';
-                } else {
-                    nums += ' ';
-                }
-            }
-        }
-    }
 
     bool inSection = true;
     // Loop through the section
@@ -921,8 +905,57 @@ void MainWindow::removeInvalidValues(int sum, int y, int x, int yDelta, int xDel
             inSection = false;
             // Check if the cell is blank and set the possible values
         } else if (board[y][x] == 0) {
-            model->item(y, x)->setText(nums);
-            // Check if the section has come to an end
+            // Get the values that are currently displaying
+            QString strNums = model->item(y, x)->text();
+            std::vector<int> nums; // Vector to store the values currently displayed
+            nums.clear();
+            // To convert the string to integers
+            std::istringstream stream(strNums.toStdString());
+            int tmp; //Temporary storage for a number in the string
+            // Checks if the character can be parsed into an integer and pushes only those
+            while (stream >> tmp) {
+                nums.push_back(tmp);
+            }
+            // Loop through the numbers
+            for (int i = 0; i < (int)nums.size(); i++){
+                // if the number is a sum, set it to 0 (because 0 will be ignored later)
+                if (nums[i] >= sum){
+                    nums[i] = 0;
+                }
+                // Loop through numsPresent and check if a numeber matches with i (current number)
+                // Set it to 0 if it does
+                for (int num : numsPresent){
+                    if (nums[i] == num){
+                        nums[i] = 0;
+                    }
+                }
+            }
+            // Clear the string to make it ready to store values
+            strNums = "";
+            // Count of numbers appended to the string
+            int count = 1;
+            for (int i = 0; i < (int)nums.size(); i++){
+                if (nums[i] != 0){
+                    // Concatenate non 0 values to the string
+                    strNums = strNums + QString::fromStdString(std::to_string(nums[i]));
+                    // For adding spaces appropriately
+                    if (i+1 != 9){
+                        if((count)%3 == 0){
+                            strNums += '\n';
+                        } else {
+                            strNums += ' ';
+                        }
+                    }
+                    count++;
+                }
+            }
+            // If a given cell has only one possible value
+            if (nums.size() == 1){
+                // Set the color to yellow
+                model->item(y, x)->setBackground(QColor::fromRgb(255,255,130));
+            }
+            model->item(y, x)->setText(strNums);
+          // Check if the section has come to an end
         } else if ((board[y][x] < 0) || (board[y][x] > 9)) {
             inSection = false;
         }
