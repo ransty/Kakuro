@@ -167,6 +167,17 @@ void MainWindow::drawBoard(){
             std::cout << board[i][j] << ", " << std::flush;
         }
         std::cout << std::endl;
+        // This code below plays with screen size
+        // Not a very good solution, but saves the user from scrolling
+        int w;
+        if (board.size() == 5) {
+            w = model->rowCount() * 150;
+        }
+        else {
+            w = model->rowCount() * 90;
+        }
+        int h = model->columnCount() * 90;
+        this->resize(w, h);
     }
 }
 
