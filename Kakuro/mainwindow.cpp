@@ -167,10 +167,8 @@ void MainWindow::drawBoard(){
             //sets the cell into the model
             model->setItem(i, j, cell);
 
-            // Prints out the solution FOR TESTING PURPOSES
-            std::cout << board[i][j] << ", " << std::flush;
+
         }
-        std::cout << std::endl;
 
     }
     checkButtons();
