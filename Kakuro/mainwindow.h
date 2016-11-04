@@ -35,6 +35,8 @@ private slots:
 
     void on_clueButton_clicked();
 
+    void on_solvePuzzleButton_clicked();
+
 private:
     void printMyMoves();
     Ui::MainWindow *ui;
@@ -64,6 +66,8 @@ private:
     std::vector<userMove> undoMoves;
     QString movesToString();
     bool showingSolution;
+    bool solvingSolution;
+    bool stoppedReplay;
 
 };
 

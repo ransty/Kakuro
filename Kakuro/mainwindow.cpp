@@ -81,6 +81,8 @@ MainWindow::MainWindow(QWidget	*parent):
     ui->boardSize->addItem("15x30");
 
     showingSolution = false;
+    solvingSolution = false;
+    stoppedReplay = false;
     checkButtons();
 }
 
@@ -1130,14 +1132,28 @@ void MainWindow::redoMove(){
 
 void MainWindow::on_replaySolutionButton_clicked()
 {
+    if(showingSolution){
+        stoppedReplay = true;
+    }
+    qDebug() <<stoppedReplay;
+    if(!stoppedReplay){
+        ui->replaySolutionButton->setText("STOP");
+        replaySolution();
+    }
+    else{
+        stoppedReplay = true;
+        ui->replaySolutionButton->setText("Replay Solution");
+
+    }
     checkButtons();
-    replaySolution();
+
 }
 
 void MainWindow::replaySolution(){
+    qDebug() <<"here";
     showingSolution = true;
     createBlankBoardFromSolution();
-    drawBoard();
+    //drawBoard();
     for(size_t i = 0; i<moves.size(); i++){
         // Create a new cell with the selected number
         cell = new QStandardItem(moves[i].getOldValue());
@@ -1156,15 +1172,22 @@ void MainWindow::replaySolution(){
         //code below is from a question asked on stack overflow
         //http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
         //sleeps for 1 second
-        QTime dieTime= QTime::currentTime().addSecs(1);
-        while (QTime::currentTime() < dieTime)
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        if(stoppedReplay == false){
+            QTime dieTime= QTime::currentTime().addSecs(1);
+            while (QTime::currentTime() < dieTime)
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        }
+
 
     }
+
+    ui->replaySolutionButton->setText("Replay Solution");
+    stoppedReplay = false;
 
     checkPuzzle();
 
     showingSolution = false;
+    checkButtons();
 
 
 }
@@ -1175,13 +1198,14 @@ void MainWindow::on_redoButton_clicked()
 }
 
 void MainWindow::checkButtons(){
-    ui->undoButton->setEnabled(moves.size() != 0 && !showingSolution);
-    ui->redoButton->setEnabled(undoMoves.size() != 0);
-    ui->replaySolutionButton->setEnabled(!showingSolution && checkPuzzle());
-    ui->saveFileButton->setEnabled(board.size() != 0 && boardSolution.size() != 0 && !showingSolution);
-    ui->loadFileButton->setEnabled(!showingSolution);
-    ui->generateBoardButton->setEnabled(!showingSolution && ui->boardSize->currentIndex() != 0);
-    ui->clueButton->setEnabled(!showingSolution && !checkPuzzle() && board.size() != 0);
+    ui->undoButton->setEnabled(moves.size() != 0 && !showingSolution && !solvingSolution);
+    ui->redoButton->setEnabled(undoMoves.size() != 0 && !solvingSolution);
+    ui->replaySolutionButton->setEnabled((checkPuzzle() && !solvingSolution) || showingSolution);
+    ui->saveFileButton->setEnabled(board.size() != 0 && boardSolution.size() != 0 && !showingSolution && !solvingSolution);
+    ui->loadFileButton->setEnabled(!showingSolution && !solvingSolution);
+    ui->generateBoardButton->setEnabled(!showingSolution && ui->boardSize->currentIndex() != 0 && !solvingSolution);
+    ui->clueButton->setEnabled(!showingSolution && !checkPuzzle() && board.size() != 0 && !solvingSolution);
+    ui->solvePuzzleButton->setEnabled(!solvingSolution && !checkPuzzle() && !showingSolution && board.size() != 0);
 }
 
 void MainWindow::on_boardSize_currentIndexChanged(int index)
@@ -1247,4 +1271,49 @@ void MainWindow::on_clueButton_clicked()
     drawBoard();
     checkButtons();
 
+}
+
+void MainWindow::on_solvePuzzleButton_clicked()
+{
+    solvingSolution = true;
+    checkButtons();
+
+
+    //removes values that aren't correct
+    for(int i = 0; i<(int) board.size(); i++){
+        for(int j = 0; j<(int)board[i].size(); j++){
+            if(board[i][j] != boardSolution[i][j]){
+                undoMoves.clear();
+                userMove newMove = userMove(i, j, board[i][j], 0);
+                board[i][j] = 0;
+
+            }
+        }
+    }
+
+    for(int i = 0; i<(int) board.size(); i++){
+        for(int j = 0; j<(int)board[i].size(); j++){
+
+            if(board[i][j] == 0){
+                undoMoves.clear();
+                userMove newMove = userMove(i, j, board[i][j], boardSolution[i][j]);
+                board[i][j] = boardSolution[i][j];
+
+                moves.push_back(newMove);
+                //all undos should be cleared
+
+
+                drawBoard();
+                //sleeps for 1 second
+                QTime dieTime= QTime::currentTime().addMSecs(250);
+                while (QTime::currentTime() < dieTime)
+                    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+            }
+
+
+
+        }
+    }
+    solvingSolution = false;
+    checkButtons();
 }
