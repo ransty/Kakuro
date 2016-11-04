@@ -179,7 +179,7 @@ void MainWindow::drawBoard(){
     int windowWidth = board[0].size() * 41; //get the width of the board
 
     // Sizes should not go below minimum
-    windowWidth = windowWidth < 750 ? 750 : windowWidth;
+    windowWidth = windowWidth < 890 ? 890 : windowWidth;
     windowHeight = windowHeight < 265 ? 265 : windowHeight;
     // Resize the window
     this->window()->resize(windowWidth, windowHeight);
@@ -954,8 +954,14 @@ void MainWindow::removeInvalidValues(int sum, int y, int x, int yDelta, int xDel
                     count++;
                 }
             }
+            int values = 0;
+            for (int num : nums){
+                if (num != 0){
+                    values++;
+                }
+            }
             // If a given cell has only one possible value
-            if (nums.size() == 1){
+            if (values == 1){
                 // Set the color to yellow
                 model->item(y, x)->setBackground(QColor::fromRgb(255,255,130));
             }
