@@ -177,7 +177,7 @@ void MainWindow::drawBoard(){
     int windowWidth = board[0].size() * 41; //get the width of the board
 
     // Sizes should not go below minimum
-    windowWidth = windowWidth < 685 ? 685 : windowWidth;
+    windowWidth = windowWidth < 750 ? 750 : windowWidth;
     windowHeight = windowHeight < 265 ? 265 : windowHeight;
     // Resize the window
     this->window()->resize(windowWidth, windowHeight);
@@ -994,7 +994,8 @@ void MainWindow::menuRequest(QPoint pos)
 
             // Add actions to enter values: 1-9
             for (int i = 1; i <= 9; i++) {
-                if(model->item(index.row(), index.column())->text().contains(QString::number(i)))
+                //uncomment this line to only show possible choices from the menu
+                //if(model->item(index.row(), index.column())->text().contains(QString::number(i)))
                     menu.addAction("Set value to " + QString::number(i));
             }
 
@@ -1180,6 +1181,7 @@ void MainWindow::checkButtons(){
     ui->saveFileButton->setEnabled(board.size() != 0 && boardSolution.size() != 0 && !showingSolution);
     ui->loadFileButton->setEnabled(!showingSolution);
     ui->generateBoardButton->setEnabled(!showingSolution && ui->boardSize->currentIndex() != 0);
+    ui->clueButton->setEnabled(!showingSolution && !checkPuzzle());
 }
 
 void MainWindow::on_boardSize_currentIndexChanged(int index)
@@ -1210,4 +1212,39 @@ void MainWindow::on_generateBoardButton_clicked()
 
     }
     checkButtons();
+}
+
+void MainWindow::on_clueButton_clicked()
+{
+    ui->clueButton->setEnabled(false);
+
+    srand(time(0));
+
+    std::vector<std::vector<int>> tempStorage;
+
+    for(int i = 0; i<(int) board.size(); i++){
+        for(int j = 0; j<(int)board[i].size(); j++){
+            if(board[i][j] == 0){
+                std::vector<int> a = {i,j};
+                tempStorage.push_back(a);
+            }
+        }
+    }
+
+
+    if(tempStorage.size()!=0){
+
+        int tempInt = (rand() % tempStorage.size() + 0);
+
+        userMove newMove = userMove(tempStorage[tempInt][0], tempStorage[tempInt][1], board[tempStorage[tempInt][0]][tempStorage[tempInt][1]], boardSolution[tempStorage[tempInt][0]][tempStorage[tempInt][1]]);
+        moves.push_back(newMove);
+        //all undos should be cleared
+        undoMoves.clear();
+
+        board[tempStorage[tempInt][0]][tempStorage[tempInt][1]] = boardSolution[tempStorage[tempInt][0]][tempStorage[tempInt][1]];
+    }
+
+    drawBoard();
+    checkButtons();
+
 }

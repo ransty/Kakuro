@@ -33,6 +33,8 @@ private slots:
 
     void on_generateBoardButton_clicked();
 
+    void on_clueButton_clicked();
+
 private:
     void printMyMoves();
     Ui::MainWindow *ui;

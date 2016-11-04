@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>714</width>
-    <height>266</height>
+    <width>890</width>
+    <height>282</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -144,6 +144,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="clueButton">
+        <property name="text">
+         <string>Clue</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -179,7 +186,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>714</width>
+     <width>890</width>
      <height>22</height>
     </rect>
    </property>
