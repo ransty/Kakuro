@@ -1,3 +1,11 @@
+/*
+ * Software Development with C++ Assignment 2 - Kakuro
+ * Group Members:
+ * Oliver Norman - noroj001
+ * Shyam Pindoria - pinsy004
+ * Keano Porcaro - porkd002
+ *
+*/
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "usermove.h"
