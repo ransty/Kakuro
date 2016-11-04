@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <QStyle>
 #include <QDesktopWidget>
+#include <QSysInfo>
 
 
 
@@ -134,7 +135,11 @@ void MainWindow::drawBoard(){
             }
             // Blank cell
             else if(board[i][j] == 0){
-                f.setPointSize(9); // sets font size
+
+                f.setPointSize(6); // sets font size
+                if (QSysInfo::productType() == "osx"){
+                    f.setPixelSize(9);
+                }
                 // Creates a cell with a string representation numbers 1-9
                 cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
             }
@@ -1042,7 +1047,10 @@ void MainWindow::menuRequest(QPoint pos)
                     // Update the cell in the board vector
                     board[index.row()][index.column()] = 0;
                     // Change the font size
-                    f.setPointSize(9);
+                    f.setPointSize(6); // sets font size
+                    if (QSysInfo::productType() == "osx"){
+                        f.setPixelSize(9);
+                    }
                 }
                 // Set font and alignment of the cell and set it to the model
                 cell->setFont(f);
