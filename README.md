@@ -11,11 +11,11 @@
 <li><strike>Task 6 - save moves to text file.</strike></li>
 <li><strike>Fix load game function.</strike></li>
 <li><strike>Add redo move to save file</strike></li> Complete
-<li>Add random number generation to board layouts.</li>
-<li>Add another grid to the option of grids. Make it a large one (20x20?)</li>
-<li>Test that everything still works with such a large board. Try load/save/undo/redo/show solution</li>
+<li>Add random number generation to board layouts. - I don't think we should do this. going to be super hard</li>
+<li><strike>Add another grid to the option of grids. Make it a large one (20x20?)</strike></li>
+<li><strike>Test that everything still works with such a large board. Try load/save/undo/redo/show solution</strike></li>
 <li>Prepare a range of different save files for each board size. Saves that are empty, saves that are almost complete, saves that are complete.</li>
-<li>Test overwriting of files. There was a mention about this not working. Fix if need be.</li>
+<li><strike>Test overwriting of files. There was a mention about this not working. Fix if need be.</strike></li>
 <li>Try and break the program. Fix bugs that are found.</li>
 
 </ol>
