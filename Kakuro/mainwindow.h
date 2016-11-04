@@ -48,7 +48,7 @@ private:
     void createBlankBoardFromSolution();
     bool checkSection(int sum, int y, int x, int yDelta, int xDelta);
     bool checkPuzzle();
-    void puzzleSolved();
+    void changeAnswerCellColor(QColor);
     void valuesInSection(int sum, int y, int x, int yDelta, int xDelta);
     void calculatePossibleValues();
     void removeInvalidValues(int sum, int y, int x, int yDelta, int xDelta, std::vector<int> numsPresent);

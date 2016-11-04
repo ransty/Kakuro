@@ -792,30 +792,33 @@ bool MainWindow::checkPuzzle(){
     if(board.size()==0)
         correct = false;
 
+    //sets the color of the board numbers
+
     if(correct)
-        puzzleSolved();
+        changeAnswerCellColor(QColor::fromRgb(0,200,0));
+    else
+        changeAnswerCellColor(QColor::fromRgb(0,0,0));
+
 
     return correct;
 
 }
 
 /**
- * @brief MainWindow::puzzleSolved
+ * @brief MainWindow::changeAnswerCellColor
  * This method is called when the puzzle is solved.
  * Changes the colour of the numbers to let the user know that the puzzle is solved.
  */
-void MainWindow::puzzleSolved(){
+void MainWindow::changeAnswerCellColor(QColor c){
     //loop through the board vector
     for(int i = 0; i<(int) board.size(); i++){
         for(int j = 0; j<(int)board[i].size(); j++){
             //change colours for cell containing 1-9 only
             if(board[i][j]>=1 && board[i][j]<=9){
-                model->item(i,j)->setForeground(QColor::fromRgb(0,200,0));
+                model->item(i,j)->setForeground(c);
             }
         }
     }
-
-
 }
 
 
@@ -990,7 +993,10 @@ void MainWindow::menuRequest(QPoint pos)
             menu.addAction("Clear set value");
 
             // Add actions to enter values: 1-9
-            for (int i = 1; i <= 9; i++) {menu.addAction("Set value to " + QString::number(i));}
+            for (int i = 1; i <= 9; i++) {
+                if(model->item(index.row(), index.column())->text().contains(QString::number(i)))
+                    menu.addAction("Set value to " + QString::number(i));
+            }
 
             // Action that was clicked on
             QAction *action = menu.exec(ui->tableView->viewport()->mapToGlobal(pos));
@@ -1033,7 +1039,7 @@ void MainWindow::menuRequest(QPoint pos)
                 model->setItem(index.row(), index.column(), cell);
 
                 // Check if the puzzle is solved
-                checkPuzzle();
+
 
                 calculatePossibleValues();
             }
@@ -1041,6 +1047,7 @@ void MainWindow::menuRequest(QPoint pos)
             delete action;
         }
     }
+    checkPuzzle();
     checkButtons();
 }
 
@@ -1144,6 +1151,7 @@ void MainWindow::replaySolution(){
 
         drawBoard();
         calculatePossibleValues();
+        checkPuzzle();
         //code below is from a question asked on stack overflow
         //http://stackoverflow.com/questions/3752742/how-do-i-create-a-pause-wait-function-using-qt
         //sleeps for 1 second
