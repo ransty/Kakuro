@@ -1175,13 +1175,13 @@ void MainWindow::on_redoButton_clicked()
 }
 
 void MainWindow::checkButtons(){
-    ui->undoButton->setEnabled(moves.size() != 0);
+    ui->undoButton->setEnabled(moves.size() != 0 && !showingSolution);
     ui->redoButton->setEnabled(undoMoves.size() != 0);
     ui->replaySolutionButton->setEnabled(!showingSolution && checkPuzzle());
     ui->saveFileButton->setEnabled(board.size() != 0 && boardSolution.size() != 0 && !showingSolution);
     ui->loadFileButton->setEnabled(!showingSolution);
     ui->generateBoardButton->setEnabled(!showingSolution && ui->boardSize->currentIndex() != 0);
-    ui->clueButton->setEnabled(!showingSolution && !checkPuzzle());
+    ui->clueButton->setEnabled(!showingSolution && !checkPuzzle() && board.size() != 0);
 }
 
 void MainWindow::on_boardSize_currentIndexChanged(int index)
