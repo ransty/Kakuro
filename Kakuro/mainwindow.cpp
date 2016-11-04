@@ -21,6 +21,7 @@
 #include <QMessageBox>
 #include <sstream>
 #include <qdebug.h>
+#include <unistd.h>
 
 
 
@@ -64,9 +65,6 @@ MainWindow::MainWindow(QWidget	*parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    // srand used to create random numbers
-    //srand(time(NULL));
-
     ui->setupUi(this);
     // Linking mouse click to slot menuRequest
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -78,10 +76,10 @@ MainWindow::MainWindow(QWidget	*parent):
     ui->boardSize->addItem("5x5");
     ui->boardSize->addItem("9x8");
     ui->boardSize->addItem("15x15");
-    ui->boardSize->addItem("19x19");
     ui->boardSize->addItem("15x30");
 
     showingSolution = false;
+    checkButtons();
 }
 
 MainWindow::~MainWindow()
@@ -169,9 +167,9 @@ void MainWindow::drawBoard(){
             std::cout << board[i][j] << ", " << std::flush;
         }
         std::cout << std::endl;
-        // This code below plays with screen size
-        // Not a very good solution, but saves the user from scrolling
+
     }
+    checkButtons();
 }
 
 /**
@@ -193,16 +191,17 @@ void MainWindow::setBoardSize(int height, int width){
         boardSolution[i].resize(width);
         //boardSolution[i].resize(width);
     }
-    int w = width * 90;
-    int h = height * 90;
-    this->resize(w, h);
+
+    //code to try and resize the board to a good size
+    //int w = width * 90;
+    //int h = height * 90;
+    //this->resize(w, h);
 }
 
 void MainWindow::populateBoard(int height, int width){
     moves.clear();
     undoMoves.clear();
-    ui->undoButton->setEnabled(false);
-    ui->redoButton->setEnabled(false);
+    checkButtons();
 
     //3 Different boards
     if (height == 5 && width == 5){
@@ -244,7 +243,8 @@ void MainWindow::populateBoard(int height, int width){
             {-2,-2,10000,2,1,7,15030,6,9,13000,2,3,8,40,-2},
             {-2,-2,30000,1,3,9,2,8,7,-2,11000,1,7,3,-2},
             {-2,-2,6000,4,2,10000,1,9,-2,-2,-2,10000,9,1,-2} };
-    } else if (height == 15 && width == 30) {
+    }
+    else if (height == 15 && width == 30) {
         boardSolution = {
             {-2,-2,60,170,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,60,100,-2,300,40,-2,-2,160,100,-2,240,160,-2,-2,-2,-2},
             {-2,10170,2,8,30,-2,-2,-2,-2,160,240,60,-2,7420,3,4,11000,8,3,30,11000,9,2,17000,8,9,-2,-2,-2,-2},
@@ -263,158 +263,7 @@ void MainWindow::populateBoard(int height, int width){
             {-2,-2,-2,-2,10000,1,9,10000,1,9,-2,11000,2,9,10000,8,2,-2,-2,-2,-2,-2,-2,-2,-2,-2,9000,3,6,-2} };
     }
 }
-/*
-//populates the board with random numbers
-void MainWindow::populateBoardRandom(){
 
-    //loops through each row
-    for(int i = 0; i<(int)boardSolution.size(); i++){
-        //loops through each column in each row
-        for(int j = 0; j<(int)boardSolution[i].size(); j++){
-            // If not a black cell or answer cell
-            if(boardSolution[i][j] >= 0){
-                //generate random number between 1 and 9
-                int randNum = rand()%(9-1 + 1) + 1;
-                //places the random number in the current board cell
-                boardSolution[i][j] = randNum;
-            }
-        }
-    }
-}
-*/
-
-
-/**
- * @brief MainWindow::populateAnswerCells sums up the horizontal and vertical sums
- *  and updates the boardSolution vector to contain the sums
- */
-/*
-void MainWindow::populateAnswerCells() {
-
-    //loops through each row
-    for(int i = 0; i<(int)boardSolution.size(); i++){
-        //loops through each column in each row
-        for(int j = 0; j<(int)boardSolution[i].size(); j++){
-
-            // for horizontal sums
-            // Don't calculate sums if it is the last column
-            if(j < ((int)boardSolution[i].size()-1)){
-                // Check whether the current cell is black and the next one on the right is a blank
-                if(boardSolution[i][j] == -2 && boardSolution[i][j+1] > 0){
-                    // Index of the next blank cells
-                    int colIndex = j + 1;
-                    // Sum for the column
-                    int colSum = 0;
-                    // Set the values of the cell back to 0 (from -1)
-                    boardSolution[i][j] = 0;
-                    // Loop until the cell on the right is not a black cell
-                    while(colIndex < (int)boardSolution[i].size() && boardSolution[i][colIndex] > 0){
-                        // Add the values of all the blank cells
-                        colSum += boardSolution[i][colIndex];
-                        colIndex++;
-                    }
-                    // Multiply the horizontal sum by 1000
-                    // This is because in some cases, both horizontal and vertical sums may be stored in one place
-                    // To get back the original sum value for a horizontal cell, just divide the current value by 1000
-                    // and remove the decimal point if any by rounding off using Math.floor()
-                    colSum = colSum*1000;
-                    boardSolution[i][j] = colSum;
-                }
-            }
-            // for vertical sums
-            // Don't calculate sums if it is the last row
-            if(i < ((int)boardSolution.size()-1)){
-                // Check whether the current cell is black or a cell with horizontal sum, and whether the cell below is blank
-                if((boardSolution[i][j] == -2 || boardSolution[i][j] >= 1000) && boardSolution[i+1][j] > 0){
-                    if (boardSolution[i][j] == -2){
-                        // If the cell is blank it will have a value of -2, so we need to make it 0 first
-                        boardSolution[i][j] = 0;
-                    }
-                    // Index of blank cells below
-                    int rowIndex = i + 1;
-                    // Sum of the row
-                    int rowSum = 0;
-                    // Loop until the cell below is not a black cell
-                    while(rowIndex < (int)boardSolution.size() && boardSolution[rowIndex][j] > 0){
-                        // Add the values of all the blank cells below
-                        rowSum += boardSolution[rowIndex][j];
-                        rowIndex++;
-                    }
-                    // Multiply the vertical sum by 10
-                    // This is because in some cases, both horizontal and vertical sums may be stored in one place
-                    // To get back the original sum value for a vertical cell, just divide it by 10 then modulo % 100
-                    // and remove the decimal points if any by rounding off using Math.floor()
-                    rowSum = rowSum * 10;
-                    boardSolution[i][j] += rowSum;
-                }
-            }
-        }
-    }
-}
-*/
-
-/*
-void MainWindow::createRandomLayout(){
-    //unimplemented at the moment
-
-    //places random black squares to start with
-    //loops through each row
-    for(int i = 0; i<(int)boardSolution.size(); i++){
-        //loops through each column in each row
-        for(int j = 0; j<(int)boardSolution[i].size(); j++){
-            // All black for top row and left column
-            if(i == 0 || j == 0){
-                board[i][j] = -2;
-                boardSolution[i][j] = -2;
-            } else {
-                int chance = 3;
-                //creates a random number
-                int randNum = rand()%(chance-1 + 1) + 1;
-                if(randNum == 1){
-                    board[i][j] = -2;
-                    boardSolution[i][j] = -2;
-                }
-            }
-        }
-    }
-
-
-
-    //need to now make sure there are no unreachable squares
-
-    //start with squares with 0 non-black neighbours
-
-    //loops through each row
-    for(int i = 1; i<(int)boardSolution.size()-1; i++){
-        //loops through each column in each row
-        for(int j = 1; j<(int)boardSolution[i].size()-1; j++){
-            if(board[i][j] == 0  && board[i+1][j] == -2 && board[i-1][j] == -2 && board[i][j+1] == -2 && board[i][j-1] == -2){
-                board[i][j] = -2;
-                boardSolution[i][j] = -2;
-            }
-        }
-        //the reason for checking this seperately is to avoid trying j+1 when there is no such cell
-        //check last cell in row
-        if(board[i][board[i].size()-1] == 0 && board[i-1][board[i].size()-1] == -2 && board[i+1][board[i].size()-1] == -2 && board[i][board[i].size()-2] == -2){
-            board[i][board[i].size()-1] = -2;
-            boardSolution[i][board[i].size()-1] = -2;
-        }
-
-
-    }
-    //check last row
-    for(int i = 1; i<(int)board[0].size()-1; i++){
-        if(board[board.size()-1][i] == 0 && board[board.size()-1][i+1] == -2 && board[board.size()-1][i-1] == -2 && board[board.size()-2][i]){
-            board[board.size()-1][i] = -2;
-            boardSolution[board.size()-1][i] = -2;
-
-
-        }
-
-    }
-
-}
-*/
 
 void MainWindow::createBlankBoardFromSolution(){
     // this is where we copy all the black cells and answer cells from boardSolution to board
@@ -434,290 +283,26 @@ void MainWindow::createBlankBoardFromSolution(){
             }
         }
     }
+    checkButtons();
 }
 
 
 //populates the board from a file
 void MainWindow::populateBoardFromFile(){
 
-    //CURRENTLY ASSUME FILE IS VALID
-    //OLD VALIDATION CODE BELOW
 
     //opens a dialog box for the user to select a file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Text Files (*.txt)"));
     
-    // If the file path is empty (they clicked cancel)
-    if (fileName == "") {
-        return;
-    }
     
     // Loads the file
     QFile file(fileName);
+
+
+
     file.open(QIODevice::ReadWrite);
 
-    //sets the file back to the first character
-    file.seek(0);
-
-    QTextStream in(&file);
-
-
-    //reads the whole file into a stringstream
-    std::stringstream ss(in.readAll().toStdString());
-    std::string token;
-
-    //strings to hold each part of the file
-    std::string sizeString;
-    std::string undoMovesString;
-    QString boardSolutionString;
-    QString boardString;
-    std::string movesString;
-
-    int loopNumber = 0;
-    //splits the file into the 4 vectors
-    while(getline(ss, token, '*')){
-        if(loopNumber == 0){
-            sizeString = token;}
-        else if(loopNumber == 1){
-            boardSolutionString = QString::fromStdString(token);
-        }
-        else if(loopNumber == 2){
-            boardString = QString::fromStdString(token);
-        }
-        else if (loopNumber == 3){
-            movesString = token;
-        } else {
-            undoMovesString = token;
-        }
-
-        loopNumber++;
-    }
-
-
-    /////////////////////////
-    //start sorting of size//
-    /////////////////////////
-
-    std::vector<std::string> sizeVector;
-    std::stringstream sizeSs(sizeString);
-    std::string sizeToken;
-    while(getline(sizeSs, sizeToken, ',')){
-        sizeVector.push_back(sizeToken);
-    }
-
-
-    //sets the board size to the data in the first vector
-    setBoardSize(std::atoi(sizeVector[0].data()),std::atoi(sizeVector[1].data()));
-
-    ////////////////////////////
-    //finished sorting of size//
-    ////////////////////////////
-
-
-    //////////////////////////////////
-    //start sorting of boardSolution//
-    //////////////////////////////////
-    QTextStream boardSolutionStream(&boardSolutionString);
-
-    int boardSolutionColumn = 0;
-    int boardSolutionLine = 0;
-
-    while (!boardSolutionStream.atEnd()) {
-        //reads the next line
-        QString line = boardSolutionStream.readLine();
-
-
-        //splits the line up again
-        std::stringstream boardSolutionSs(line.toStdString());
-        std::string boardSolutionToken;
-        while (getline(boardSolutionSs,boardSolutionToken, ','))
-        {
-
-            //actually enters the data into the arrays now
-            //have no idea why I need to do lineNumber - 1
-            boardSolution[boardSolutionLine-1][boardSolutionColumn] = QString::fromStdString(boardSolutionToken).toDouble();
-            boardSolutionColumn++;
-        }
-        boardSolutionColumn = 0;
-        boardSolutionLine++;
-    }
-
-    /////////////////////////////////////
-    //finished sorting of boardSolution//
-    /////////////////////////////////////
-
-    //////////////////////////
-    //start sorting of board//
-    //////////////////////////
-    QTextStream boardStream(&boardString);
-
-    int columnNumber = 0;
-    int lineNumber = 0;
-
-    while (!boardStream.atEnd()) {
-        //reads the nect line
-        QString line = boardStream.readLine();
-
-
-        //splits the line up again
-        std::stringstream boardSs(line.toStdString());
-        std::string boardToken;
-        while (getline(boardSs,boardToken, ','))
-        {
-
-            //actually enters the data into the arrays now
-            //have no idea why I need to do lineNumber - 1
-            board[lineNumber-1][columnNumber] = QString::fromStdString(boardToken).toDouble();
-            columnNumber++;
-        }
-        columnNumber = 0;
-        lineNumber++;
-    }
-
-    /////////////////////////////
-    //finished sorting of board//
-    /////////////////////////////
-
-
-    //////////////////////////
-    //start sorting of moves//
-    //////////////////////////
-
-    //need to clear the current move board
-    moves.clear();
-
-    //does our normal looping through a string and stopping at each ,
-    std::stringstream moveSs(movesString);
-    std::string moveToken;
-
-    //need this test to remove whitespace line
-    while (getline(moveSs,moveToken, '{'))
-    {
-        //checks if the line is valid
-        int bracketLoc = moveToken.find('}');
-        if(bracketLoc != -1){
-            //gets the values in the format 1,1,1,1
-            moveToken = moveToken.substr(0, bracketLoc);
-
-
-            //variables to store the data in
-            int rowTemp;
-            int columnTemp;
-            int oldTemp;
-            int newTemp;
-
-            //counter to know which value it is up to
-            int count = 0;
-
-            //splits the string into individual integers
-            std::stringstream boardSs2(moveToken);
-            std::string boardToken2;
-            while (getline(boardSs2,boardToken2, ','))
-            {
-                //puts the current value into the correct temp integer
-                if(count==0)
-                    rowTemp = std::atoi(boardToken2.c_str());
-                else if(count==1)
-                    columnTemp = std::atoi(boardToken2.c_str());
-                else if(count==2)
-                    oldTemp = std::atoi(boardToken2.c_str());
-                else
-                    newTemp = std::atoi(boardToken2.c_str());
-                count++;
-            }
-
-            //Now create userMove
-            userMove myMove(rowTemp, columnTemp, oldTemp, newTemp);
-            // Push the move
-            moves.push_back(myMove);
-        }
-
-
-    }
-
-    if(moves.size()!=0)
-        ui->undoButton->setEnabled(true);
-
-    /////////////////////////////
-    //finished sorting of moves//
-    /////////////////////////////
-
-    //////////////////////////////
-    //start sorting of undomoves//
-    //////////////////////////////
-
-    //need to clear the current move board
-    undoMoves.clear();
-
-    //does our normal looping through a string and stopping at each ,
-    std::stringstream undoMovesS(undoMovesString);
-    std::string undoToken;
-
-    //need this test to remove whitespace line
-    while (getline(undoMovesS,undoToken, '{'))
-    {
-        //checks if the line is valid
-        int bracketLoc = undoToken.find('}');
-        if(bracketLoc != -1){
-            //gets the values in the format 1,1,1,1
-            undoToken = undoToken.substr(0, bracketLoc);
-
-
-            //variables to store the data in
-            int rowTemp;
-            int columnTemp;
-            int oldTemp;
-            int newTemp;
-
-            //counter to know which value it is up to
-            int count = 0;
-
-            //splits the string into individual integers
-            std::stringstream boardSs2(undoToken);
-            std::string boardToken2;
-            while (getline(boardSs2,boardToken2, ','))
-            {
-                //puts the current value into the correct temp integer
-                if(count==0)
-                    rowTemp = std::atoi(boardToken2.c_str());
-                else if(count==1)
-                    columnTemp = std::atoi(boardToken2.c_str());
-                else if(count==2)
-                    oldTemp = std::atoi(boardToken2.c_str());
-                else
-                    newTemp = std::atoi(boardToken2.c_str());
-                count++;
-            }
-
-            //Now create userMove
-            userMove myMove(rowTemp, columnTemp, oldTemp, newTemp);
-            // Push the move
-            undoMoves.push_back(myMove);
-        }
-
-    }
-
-
-    /////////////////////////////////
-    //finished sorting of undomoves//
-    /////////////////////////////////
-
-    //undoMoves.clear();
-
-    if(undoMoves.size()!=0) {
-        ui->redoButton->setEnabled(true);
-    }
-
-    drawBoard();
-    calculatePossibleValues();
-
-
-    /*
-    if (file.isReadable()) {
-    //calls the validateFile function
-    if (validateFile(&file) == false){
-        //if it fails to validate,
-        //the program will ask if they want to select a new file to try
-
+    if(!validateFile(&file)){
         //creating the message box
         QMessageBox msg;
         msg.setText("Failed. Would you like to try again with a new file?");
@@ -733,105 +318,290 @@ void MainWindow::populateBoardFromFile(){
         }
     }
     else{
-        //file is valid
 
         //sets the file back to the first character
+        //as this will change during validation
         file.seek(0);
-
-        //first need to find how big the grid will be
-        //this whole section is to do so
-        //this might be able to be condensed to something easier
-
-        int width = 0;
-        int height = 0;
 
         QTextStream in(&file);
 
-        //loops through each line in the file
-        while (!in.atEnd()) {
-            //each line means there is another row of cells
-            height ++;
-            //reads the line
-            QString line = in.readLine();
 
-            //using a stringstream to seperate the values from the commas
-            std::stringstream ss(line.toStdString());
-            std::string token;
-            width = 0;
-            //loops through each number
-            while (getline(ss,token, ','))
-            {
-                width++;
+        //reads the whole file into a stringstream
+        std::stringstream ss(in.readAll().toStdString());
+        std::string token;
+
+        //strings to hold each part of the file
+        std::string sizeString;
+        std::string undoMovesString;
+        QString boardSolutionString;
+        QString boardString;
+        std::string movesString;
+
+        int loopNumber = 0;
+        //splits the file into the 4 vectors
+        while(getline(ss, token, '*')){
+            if(loopNumber == 0){
+                sizeString = token;}
+            else if(loopNumber == 1){
+                boardSolutionString = QString::fromStdString(token);
             }
+            else if(loopNumber == 2){
+                boardString = QString::fromStdString(token);
+            }
+            else if (loopNumber == 3){
+                movesString = token;
+            } else {
+                undoMovesString = token;
+            }
+
+            loopNumber++;
         }
-        //sets the board to the correct size
-        setBoardSize(height, width);
 
-        //sets the file back to the first character
-        file.seek(0);
 
-        //counters for current line and column
-        int lineNumber = 0;
-        int columnNumber = 0;
+        /////////////////////////
+        //start sorting of size//
+        /////////////////////////
 
-        //loops through each line
-        while (!in.atEnd()) {
-            //reads the nect line
-            QString line = in.readLine();
+        std::vector<std::string> sizeVector;
+        std::stringstream sizeSs(sizeString);
+        std::string sizeToken;
+        while(getline(sizeSs, sizeToken, ',')){
+            sizeVector.push_back(sizeToken);
+        }
+
+
+        //sets the board size to the data in the first vector
+        setBoardSize(std::atoi(sizeVector[0].data()),std::atoi(sizeVector[1].data()));
+
+        ////////////////////////////
+        //finished sorting of size//
+        ////////////////////////////
+
+
+        //////////////////////////////////
+        //start sorting of boardSolution//
+        //////////////////////////////////
+        QTextStream boardSolutionStream(&boardSolutionString);
+
+        int boardSolutionColumn = 0;
+        int boardSolutionLine = 0;
+
+        while (!boardSolutionStream.atEnd()) {
+            //reads the next line
+            QString line = boardSolutionStream.readLine();
+
 
             //splits the line up again
-            std::stringstream ss(line.toStdString());
-            std::string token;
-            while (getline(ss,token, ','))
+            std::stringstream boardSolutionSs(line.toStdString());
+            std::string boardSolutionToken;
+            while (getline(boardSolutionSs,boardSolutionToken, ','))
             {
+
                 //actually enters the data into the arrays now
-                board[lineNumber][columnNumber] = QString::fromStdString(token).toDouble();
+                //have no idea why I need to do lineNumber - 1
+                boardSolution[boardSolutionLine-1][boardSolutionColumn] = QString::fromStdString(boardSolutionToken).toDouble();
+                boardSolutionColumn++;
+            }
+            boardSolutionColumn = 0;
+            boardSolutionLine++;
+        }
+
+        /////////////////////////////////////
+        //finished sorting of boardSolution//
+        /////////////////////////////////////
+
+        //////////////////////////
+        //start sorting of board//
+        //////////////////////////
+        QTextStream boardStream(&boardString);
+
+        int columnNumber = 0;
+        int lineNumber = 0;
+
+        while (!boardStream.atEnd()) {
+            //reads the nect line
+            QString line = boardStream.readLine();
+
+
+            //splits the line up again
+            std::stringstream boardSs(line.toStdString());
+            std::string boardToken;
+            while (getline(boardSs,boardToken, ','))
+            {
+
+                //actually enters the data into the arrays now
+                //have no idea why I need to do lineNumber - 1
+                board[lineNumber-1][columnNumber] = QString::fromStdString(boardToken).toDouble();
                 columnNumber++;
             }
             columnNumber = 0;
             lineNumber++;
         }
+
+        /////////////////////////////
+        //finished sorting of board//
+        /////////////////////////////
+
+
+        //////////////////////////
+        //start sorting of moves//
+        //////////////////////////
+
+        //need to clear the current move board
+        moves.clear();
+
+        //does our normal looping through a string and stopping at each ,
+        std::stringstream moveSs(movesString);
+        std::string moveToken;
+
+        //need this test to remove whitespace line
+        while (getline(moveSs,moveToken, '{'))
+        {
+            //checks if the line is valid
+            int bracketLoc = moveToken.find('}');
+            if(bracketLoc != -1){
+                //gets the values in the format 1,1,1,1
+                moveToken = moveToken.substr(0, bracketLoc);
+
+
+                //variables to store the data in
+                int rowTemp;
+                int columnTemp;
+                int oldTemp;
+                int newTemp;
+
+                //counter to know which value it is up to
+                int count = 0;
+
+                //splits the string into individual integers
+                std::stringstream boardSs2(moveToken);
+                std::string boardToken2;
+                while (getline(boardSs2,boardToken2, ','))
+                {
+                    //puts the current value into the correct temp integer
+                    if(count==0)
+                        rowTemp = std::atoi(boardToken2.c_str());
+                    else if(count==1)
+                        columnTemp = std::atoi(boardToken2.c_str());
+                    else if(count==2)
+                        oldTemp = std::atoi(boardToken2.c_str());
+                    else
+                        newTemp = std::atoi(boardToken2.c_str());
+                    count++;
+                }
+
+                //Now create userMove
+                userMove myMove(rowTemp, columnTemp, oldTemp, newTemp);
+                // Push the move
+                moves.push_back(myMove);
+            }
+
+
+        }
+
+        /////////////////////////////
+        //finished sorting of moves//
+        /////////////////////////////
+
+        //////////////////////////////
+        //start sorting of undomoves//
+        //////////////////////////////
+
+        //need to clear the current move board
+        undoMoves.clear();
+
+        //does our normal looping through a string and stopping at each ,
+        std::stringstream undoMovesS(undoMovesString);
+        std::string undoToken;
+
+        //need this test to remove whitespace line
+        while (getline(undoMovesS,undoToken, '{'))
+        {
+            //checks if the line is valid
+            int bracketLoc = undoToken.find('}');
+            if(bracketLoc != -1){
+                //gets the values in the format 1,1,1,1
+                undoToken = undoToken.substr(0, bracketLoc);
+
+
+                //variables to store the data in
+                int rowTemp;
+                int columnTemp;
+                int oldTemp;
+                int newTemp;
+
+                //counter to know which value it is up to
+                int count = 0;
+
+                //splits the string into individual integers
+                std::stringstream boardSs2(undoToken);
+                std::string boardToken2;
+                while (getline(boardSs2,boardToken2, ','))
+                {
+                    //puts the current value into the correct temp integer
+                    if(count==0)
+                        rowTemp = std::atoi(boardToken2.c_str());
+                    else if(count==1)
+                        columnTemp = std::atoi(boardToken2.c_str());
+                    else if(count==2)
+                        oldTemp = std::atoi(boardToken2.c_str());
+                    else
+                        newTemp = std::atoi(boardToken2.c_str());
+                    count++;
+                }
+
+                //Now create userMove
+                userMove myMove(rowTemp, columnTemp, oldTemp, newTemp);
+                // Push the move
+                undoMoves.push_back(myMove);
+            }
+
+        }
+
+
+        /////////////////////////////////
+        //finished sorting of undomoves//
+        /////////////////////////////////
+
+        //undoMoves.clear();
+        drawBoard();
+        //checks if puzzle solved
+        puzzleSolved();
+        calculatePossibleValues();
     }
-    drawBoard();
-    }
-    */
+
+
+    checkButtons();
 }
 
 //validates if a file is okay to be used
 bool MainWindow::validateFile(QFile* file){
     //safety check for file
-    if (!file->open(QIODevice::ReadOnly | QIODevice::Text))
+    qDebug() << file->isReadable();
+    //returns ƒalse if not readable
+    if(!file->isReadable()){
         return false;
+    }
 
-    QTextStream in(file);
-    int lineLength = 0;
-    while (!in.atEnd()) {
-        QString line = in.readLine();
+    //check for 5 sections
+    //size, board, boardSolution, undo, redo
+    QTextStream fileStream(file);
+    int starCount = 0;
 
-        //check all lines are the same length
-        //first line
-        if(lineLength == 0){
-            lineLength = line.count(",");
-        }
-        else{
-            //line is not the same length as the last line
-            if(lineLength!=line.count(",")){
-                //failed
-                return false;
-            }
-        }
-
-
-        //checks if the current line contains anything but numbers and commas
-        QRegExp r("^-?[0-9](,-?[0-9])*$");
-        if(line.contains(r)){
-
-        }
-        else{
-            //failed
-            return false;
+    while (!fileStream.atEnd()) {
+        //reads the next line
+        QString line = fileStream.readLine();
+        if(line.contains("*")){
+            starCount++;
         }
     }
+    if(starCount!=4)
+        return false;
+
+
+    QTextStream in(file);
+
+
 
 
     //made it to the end of testing
@@ -1001,7 +771,12 @@ bool MainWindow::checkPuzzle(){
             break;
         }
     }
-    return correct;
+
+    if(board.size()==0)
+        correct = false;
+
+    if(correct)
+        puzzleSolved();
 
 }
 
@@ -1011,8 +786,6 @@ bool MainWindow::checkPuzzle(){
  * Changes the colour of the numbers to let the user know that the puzzle is solved.
  */
 void MainWindow::puzzleSolved(){
-    //sets the replay solution button to be enabled
-    ui->replaySolutionButton->setEnabled(true);
     //loop through the board vector
     for(int i = 0; i<(int) board.size(); i++){
         for(int j = 0; j<(int)board[i].size(); j++){
@@ -1137,34 +910,6 @@ void MainWindow::removeInvalidValues(int sum, int y, int x, int yDelta, int xDel
     }
 }
 
-void MainWindow::on_RandomNumbers_clicked()
-{
-    //get text from the combo box
-    QString size = ui->boardSize->currentText();
-    //check if the user has acutally selected the size
-    if (size != "Board Size"){
-        //set up size of array
-        int height = size.left(size.indexOf("x")).toInt(); //get the height of the board
-        int width = size.right(size.indexOf("x")).toInt(); //get the width of the board
-        setBoardSize(height, width); //initialise the board
-        populateBoard(height, width);
-        //create random layout
-        //createRandomLayout();
-        //populates the boardSolution vector
-        //populateBoardRandom();
-        //Adds up the horizontal and vertical sums
-        //populateAnswerCells();
-
-        //populates the board vector
-        createBlankBoardFromSolution();
-        //calculate solutions
-        //calculateSolutions();
-        //draws the board to the screen
-        drawBoard();
-    }
-
-}
-
 void MainWindow::on_saveFileButton_clicked()
 {
     // Only fair to use
@@ -1208,10 +953,6 @@ void MainWindow::menuRequest(QPoint pos)
                     //all undos should be cleared
                     undoMoves.clear();
 
-                    //set undo button to enabled and the redo button to disabled
-                    ui->undoButton->setEnabled(true);
-                    ui->redoButton->setEnabled(false);
-
                     // Create a new cell with the selected number
                     cell = new QStandardItem(action->text().right(1));
                     // Update the board with the selected number
@@ -1226,9 +967,6 @@ void MainWindow::menuRequest(QPoint pos)
                     moves.push_back(newMove);
                     //all undos should be cleared
                     undoMoves.clear();
-                    //set undo button to enabled and the redo button to disabled
-                    ui->undoButton->setEnabled(true);
-                    ui->redoButton->setEnabled(false);
 
                     // Create a cell with the default string for blank cell
                     cell = new QStandardItem(QString("1 2 3\n4 5 6\n7 8 9"));
@@ -1243,19 +981,15 @@ void MainWindow::menuRequest(QPoint pos)
                 model->setItem(index.row(), index.column(), cell);
 
                 // Check if the puzzle is solved
-                if (checkPuzzle()){
-                    // if puzzle is solved
-                    puzzleSolved();
-                }
-                else{
-                    ui->replaySolutionButton->setEnabled(false);
-                }
+                puzzleSolved();
+
                 calculatePossibleValues();
             }
             // Now delete the action
             delete action;
         }
     }
+    checkButtons();
 }
 
 
@@ -1299,11 +1033,8 @@ void MainWindow::undoMove(){
         undoMoves.push_back(moves.back());
         moves.pop_back();
 
-        ui->redoButton->setEnabled(true);
     }
-    if(moves.size() == 0){
-        ui->undoButton->setEnabled(false);
-    }
+    checkButtons();
     calculatePossibleValues();
 }
 
@@ -1327,24 +1058,19 @@ void MainWindow::redoMove(){
         moves.push_back(undoMoves.back());
         undoMoves.pop_back();
 
-        ui->undoButton->setEnabled(true);
 
     }
-    if(undoMoves.size() == 0){
-        ui->redoButton->setEnabled(false);
-    }
-    if (checkPuzzle()){
-        // if puzzle is solved
-        puzzleSolved();
-    }
+    checkButtons();
+    //checks if puzzle is solved
+    puzzleSolved();
+
     calculatePossibleValues();
 
 }
 
 void MainWindow::on_replaySolutionButton_clicked()
 {
-    //ui->undoButton->setEnabled(false);
-    ui->replaySolutionButton->setEnabled(false);
+    checkButtons();
     replaySolution();
 }
 
@@ -1385,4 +1111,43 @@ void MainWindow::replaySolution(){
 void MainWindow::on_redoButton_clicked()
 {
     redoMove();
+}
+
+void MainWindow::checkButtons(){
+    ui->undoButton->setEnabled(moves.size() != 0);
+    ui->redoButton->setEnabled(undoMoves.size() != 0);
+    ui->replaySolutionButton->setEnabled(!showingSolution && checkPuzzle());
+    ui->saveFileButton->setEnabled(board.size() != 0 && boardSolution.size() != 0 && !showingSolution);
+    ui->loadFileButton->setEnabled(!showingSolution);
+    ui->generateBoardButton->setEnabled(!showingSolution && ui->boardSize->currentIndex() != 0);
+}
+
+void MainWindow::on_boardSize_currentIndexChanged(int index)
+{
+    checkButtons();
+}
+
+void MainWindow::on_generateBoardButton_clicked()
+{
+    //get text from the combo box
+    QString size = ui->boardSize->currentText();
+    //check if the user has acutally selected the size
+    if (size != "Board Size"){
+        //set up size of array
+        int height = size.left(size.indexOf("x")).toInt(); //get the height of the board
+        int width = size.right(size.indexOf("x")).toInt(); //get the width of the board
+        setBoardSize(height, width); //initialise the board
+        populateBoard(height, width);
+
+        //populates the board vector
+        createBlankBoardFromSolution();
+        //calculate solutions
+        //calculateSolutions();
+        //draws the board to the screen
+        drawBoard();
+
+        ui->boardSize->setCurrentIndex(0);
+
+    }
+    checkButtons();
 }

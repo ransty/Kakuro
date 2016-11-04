@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>686</width>
-    <height>250</height>
+    <width>1920</width>
+    <height>1000</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -97,7 +97,7 @@
     <item row="1" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="RandomNumbers">
+       <widget class="QPushButton" name="generateBoardButton">
         <property name="text">
          <string>Generate Board</string>
         </property>
@@ -179,8 +179,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>686</width>
-     <height>19</height>
+     <width>1920</width>
+     <height>22</height>
     </rect>
    </property>
    <property name="minimumSize">

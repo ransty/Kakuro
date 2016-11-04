@@ -19,7 +19,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_RandomNumbers_clicked();
     void on_saveFileButton_clicked();
     void on_loadFileButton_clicked();
     void menuRequest(QPoint pos);
@@ -29,6 +28,10 @@ private slots:
     void on_replaySolutionButton_clicked();
 
     void on_redoButton_clicked();
+
+    void on_boardSize_currentIndexChanged(int index);
+
+    void on_generateBoardButton_clicked();
 
 private:
     void printMyMoves();
@@ -52,6 +55,7 @@ private:
     void undoMove();
     void redoMove();
     void replaySolution();
+    void checkButtons();
     std::vector<std::vector<double>> board;
     std::vector<std::vector<double>> boardSolution;
     std::vector<userMove> moves;
