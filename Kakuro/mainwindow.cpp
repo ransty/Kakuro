@@ -583,7 +583,7 @@ void MainWindow::populateBoardFromFile(){
         //undoMoves.clear();
         drawBoard();
         //checks if puzzle solved
-        puzzleSolved();
+        checkPuzzle();
         calculatePossibleValues();
     }
 
@@ -1000,7 +1000,7 @@ void MainWindow::menuRequest(QPoint pos)
                 model->setItem(index.row(), index.column(), cell);
 
                 // Check if the puzzle is solved
-                puzzleSolved();
+                checkPuzzle();
 
                 calculatePossibleValues();
             }
@@ -1081,7 +1081,7 @@ void MainWindow::redoMove(){
     }
     checkButtons();
     //checks if puzzle is solved
-    puzzleSolved();
+    checkPuzzle();
 
     calculatePossibleValues();
 
@@ -1120,7 +1120,7 @@ void MainWindow::replaySolution(){
 
     }
 
-    puzzleSolved();
+    checkPuzzle();
 
     showingSolution = false;
 
