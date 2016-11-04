@@ -455,6 +455,7 @@ void MainWindow::populateBoardFromFile(){
 
     //strings to hold each part of the file
     std::string sizeString;
+    std::string undoMovesString;
     QString boardSolutionString;
     QString boardString;
     std::string movesString;
@@ -470,8 +471,10 @@ void MainWindow::populateBoardFromFile(){
         else if(loopNumber == 2){
             boardString = QString::fromStdString(token);
         }
-        else{
+        else if (loopNumber == 3){
             movesString = token;
+        } else {
+            undoMovesString = token;
         }
 
         loopNumber++;
@@ -630,15 +633,67 @@ void MainWindow::populateBoardFromFile(){
     //start sorting of undomoves//
     //////////////////////////////
 
+    //need to clear the current move board
+    undoMoves.clear();
+
+    //does our normal looping through a string and stopping at each ,
+    std::stringstream undoMovesS(undoMovesString);
+    std::string undoToken;
+
+    //need this test to remove whitespace line
+    while (getline(undoMovesS,undoToken, '{'))
+    {
+        //checks if the line is valid
+        int bracketLoc = undoToken.find('}');
+        if(bracketLoc != -1){
+            //gets the values in the format 1,1,1,1
+            undoToken = undoToken.substr(0, bracketLoc);
+
+
+            //variables to store the data in
+            int rowTemp;
+            int columnTemp;
+            int oldTemp;
+            int newTemp;
+
+            //counter to know which value it is up to
+            int count = 0;
+
+            //splits the string into individual integers
+            std::stringstream boardSs2(undoToken);
+            std::string boardToken2;
+            while (getline(boardSs2,boardToken2, ','))
+            {
+                //puts the current value into the correct temp integer
+                if(count==0)
+                    rowTemp = std::atoi(boardToken2.c_str());
+                else if(count==1)
+                    columnTemp = std::atoi(boardToken2.c_str());
+                else if(count==2)
+                    oldTemp = std::atoi(boardToken2.c_str());
+                else
+                    newTemp = std::atoi(boardToken2.c_str());
+                count++;
+            }
+
+            //Now create userMove
+            userMove myMove(rowTemp, columnTemp, oldTemp, newTemp);
+            // Push the move
+            undoMoves.push_back(myMove);
+        }
+
+    }
+
 
     /////////////////////////////////
     //finished sorting of undomoves//
     /////////////////////////////////
 
-    undoMoves.clear();
+    //undoMoves.clear();
 
-    if(undoMoves.size()!=0)
-        ui->redoButton;
+    if(undoMoves.size()!=0) {
+        ui->redoButton->setEnabled(true);
+    }
 
     drawBoard();
     calculatePossibleValues();
@@ -839,6 +894,13 @@ void MainWindow::saveBoard() {
 
         // Now print the moves
         for (auto i : moves) {
+            out << i.toString();
+        }
+
+        out << "\n*\n";
+
+        // Now print the undoMoves
+        for (auto i : undoMoves) {
             out << i.toString();
         }
 
