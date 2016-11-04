@@ -10,7 +10,7 @@
 <li><strike>Once win solution occurs; let the user 'replay' the way the solution was found.</strike></li>
 <li><strike>Task 6 - save moves to text file.</strike></li>
 <li><strike>Fix load game function.</strike></li>
-<li>Add redo move to save file</li>
+<li><strike>Add redo move to save file</strike></li> Complete
 <li>Add random number generation to board layouts.</li>
 <li>Add another grid to the option of grids. Make it a large one (20x20?)</li>
 <li>Test that everything still works with such a large board. Try load/save/undo/redo/show solution</li>
