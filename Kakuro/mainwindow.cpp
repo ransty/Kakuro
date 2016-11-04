@@ -964,6 +964,10 @@ void MainWindow::removeInvalidValues(int sum, int y, int x, int yDelta, int xDel
             if (values == 1){
                 // Set the color to yellow
                 model->item(y, x)->setBackground(QColor::fromRgb(255,255,130));
+            // If a cell has no possible value
+            } else if (values == 0) {
+                // Set the color to red
+                model->item(y, x)->setBackground(QColor::fromRgb(255,130,130));
             }
             model->item(y, x)->setText(strNums);
           // Check if the section has come to an end
