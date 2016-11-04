@@ -55,6 +55,7 @@ private:
     std::vector<std::vector<double>> board;
     std::vector<std::vector<double>> boardSolution;
     std::vector<userMove> moves;
+    std::vector<userMove> undoMoves;
     QString movesToString();
     bool showingSolution;
 
