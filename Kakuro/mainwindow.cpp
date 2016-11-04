@@ -22,6 +22,8 @@
 #include <sstream>
 #include <qdebug.h>
 #include <unistd.h>
+#include <QStyle>
+#include <QDesktopWidget>
 
 
 
@@ -170,6 +172,28 @@ void MainWindow::drawBoard(){
 
     }
     checkButtons();
+
+    int windowHeight = board.size() * 47; //get the height of the board
+    int windowWidth = board[0].size() * 41; //get the width of the board
+
+    // Sizes should not go below minimum
+    windowWidth = windowWidth < 685 ? 685 : windowWidth;
+    windowHeight = windowHeight < 265 ? 265 : windowHeight;
+    // Resize the window
+    this->window()->resize(windowWidth, windowHeight);
+    // Set the window to the center of the screen
+    // So that the window does not go out of the screen
+    // The piece of code below was snipped from a Qt Wiki post "How to Center a Window on the Screen"
+    // https://wiki.qt.io/How_to_Center_a_Window_on_the_Screen
+    this->window()->setGeometry(
+                QStyle::alignedRect(
+                    Qt::LeftToRight,
+                    Qt::AlignCenter,
+                    this->window()->size(),
+                    qApp->desktop()->availableGeometry()
+                    )
+                );
+
 }
 
 /**
@@ -185,17 +209,10 @@ void MainWindow::setBoardSize(int height, int width){
     //just sets the size of the multidimentional array
     board.resize(height);
     boardSolution.resize(height);
-    //boardSolution.resize(height);
     for(int i = 0; i<height; i++){
         board[i].resize(width);
         boardSolution[i].resize(width);
-        //boardSolution[i].resize(width);
     }
-
-    //code to try and resize the board to a good size
-    //int w = width * 90;
-    //int h = height * 90;
-    //this->resize(w, h);
 }
 
 void MainWindow::populateBoard(int height, int width){
