@@ -633,7 +633,7 @@ void MainWindow::populateBoardFromFile(){
     //start sorting of undomoves//
     //////////////////////////////
 
-    //need to clear the current move board
+    //need to clear the current undoMove vector
     undoMoves.clear();
 
     //does our normal looping through a string and stopping at each ,
