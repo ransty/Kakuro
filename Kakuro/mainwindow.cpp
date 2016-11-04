@@ -778,6 +778,8 @@ bool MainWindow::checkPuzzle(){
     if(correct)
         puzzleSolved();
 
+    return correct;
+
 }
 
 /**
