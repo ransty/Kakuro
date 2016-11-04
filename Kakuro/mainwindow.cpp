@@ -78,6 +78,8 @@ MainWindow::MainWindow(QWidget	*parent):
     ui->boardSize->addItem("5x5");
     ui->boardSize->addItem("9x8");
     ui->boardSize->addItem("15x15");
+    ui->boardSize->addItem("19x19");
+    ui->boardSize->addItem("15x30");
 
     showingSolution = false;
 }
@@ -191,14 +193,8 @@ void MainWindow::setBoardSize(int height, int width){
         boardSolution[i].resize(width);
         //boardSolution[i].resize(width);
     }
-    int w;
-    if (board[0].size() == 5) {
-        w = board.size() * 150;
-    }
-    else {
-        w = board[0].size() * 90;
-    }
-    int h = board.size() * 90;
+    int w = width * 90;
+    int h = height * 90;
     this->resize(w, h);
 }
 
@@ -208,49 +204,65 @@ void MainWindow::populateBoard(int height, int width){
     ui->undoButton->setEnabled(false);
     ui->redoButton->setEnabled(false);
 
-     //3 Different boards
-        if (height == 5 && width == 5){
-            boardSolution = {
-                    {-2,-2,100,290,-2},
-                    {-2,6170,1,5,30},
-                    {22000,9,3,8,2},
-                    {18000,8,2,7,1},
-                    {-2,13000,4,9,-2} };
+    //3 Different boards
+    if (height == 5 && width == 5){
+        boardSolution = {
+            {-2,-2,100,290,-2},
+            {-2,6170,1,5,30},
+            {22000,9,3,8,2},
+            {18000,8,2,7,1},
+            {-2,13000,4,9,-2} };
 
-        }
-        else if (height == 9 && width == 8){
-            boardSolution = {
-                    {-2,-2,260,80,-2,210,140,-2},
-                    {-2,11000,9,2,16040,7,9,-2},
-                    {-2,17030,1,6,3,2,5,-2},
-                    {9000,2,7,10000,1,9,160,-2},
-                    {6000,1,5,220,4000,3,1,160},
-                    {-2,12000,4,8,110,12000,3,9},
-                    {-2,-2,15130,6,9,9110,2,7},
-                    {-2,21000,5,1,2,9,4,-2},
-                    {-2,15000,8,7,8000,2,6,-2} };
+    }
+    else if (height == 9 && width == 8){
+        boardSolution = {
+            {-2,-2,260,80,-2,210,140,-2},
+            {-2,11000,9,2,16040,7,9,-2},
+            {-2,17030,1,6,3,2,5,-2},
+            {9000,2,7,10000,1,9,160,-2},
+            {6000,1,5,220,4000,3,1,160},
+            {-2,12000,4,8,110,12000,3,9},
+            {-2,-2,15130,6,9,9110,2,7},
+            {-2,21000,5,1,2,9,4,-2},
+            {-2,15000,8,7,8000,2,6,-2} };
 
-        }
-        else if (height == 15 && width == 15){
-            boardSolution = {
-                    {-2,-2,40,60,-2,-2,-2,-2,70,160,-2,60,300,-2,-2},
-                    {-2,4000,1,3,160,-2,-2,8230,1,7,8040,1,7,-2,-2},
-                    {-2,14000,3,2,9,240,32000,6,4,9,3,2,8,-2,-2},
-                    {-2,-2,16000,1,7,8,10040,8,2,13000,1,3,9,40,30},
-                    {-2,-2,-2,-2,19290,7,3,9,160,160,-2,9000,6,1,2},
-                    {-2,-2,40,15160,5,9,1,9350,2,7,170,-2,4000,3,1},
-                    {-2,18000,3,7,8,-2,27000,7,3,9,8,100,-2,-2,-2},
-                    {-2,17000,1,9,7,30,10000,9,1,11000,9,2,40,160,-2},
-                    {-2,-2,-2,11000,9,2,14030,8,6,-2,13000,1,3,9,-2},
-                    {-2,30,160,-2,12000,1,2,5,4,170,12060,4,1,7,-2},
-                    {8000,1,7,100,-2,7000,1,6,12240,8,1,3,-2,-2,-2},
-                    {14000,2,9,3,60,160,-2,20230,8,9,3,40,240,-2,-2},
-                    {-2,-2,10000,2,1,7,15030,6,9,13000,2,3,8,40,-2},
-                    {-2,-2,30000,1,3,9,2,8,7,-2,11000,1,7,3,-2},
-                    {-2,-2,6000,4,2,10000,1,9,-2,-2,-2,10000,9,1,-2} };
-        }
+    }
+    else if (height == 15 && width == 15){
+        boardSolution = {
+            {-2,-2,40,60,-2,-2,-2,-2,70,160,-2,60,300,-2,-2},
+            {-2,4000,1,3,160,-2,-2,8230,1,7,8040,1,7,-2,-2},
+            {-2,14000,3,2,9,240,32000,6,4,9,3,2,8,-2,-2},
+            {-2,-2,16000,1,7,8,10040,8,2,13000,1,3,9,40,30},
+            {-2,-2,-2,-2,19290,7,3,9,160,160,-2,9000,6,1,2},
+            {-2,-2,40,15160,5,9,1,9350,2,7,170,-2,4000,3,1},
+            {-2,18000,3,7,8,-2,27000,7,3,9,8,100,-2,-2,-2},
+            {-2,17000,1,9,7,30,10000,9,1,11000,9,2,40,160,-2},
+            {-2,-2,-2,11000,9,2,14030,8,6,-2,13000,1,3,9,-2},
+            {-2,30,160,-2,12000,1,2,5,4,170,12060,4,1,7,-2},
+            {8000,1,7,100,-2,7000,1,6,12240,8,1,3,-2,-2,-2},
+            {14000,2,9,3,60,160,-2,20230,8,9,3,40,240,-2,-2},
+            {-2,-2,10000,2,1,7,15030,6,9,13000,2,3,8,40,-2},
+            {-2,-2,30000,1,3,9,2,8,7,-2,11000,1,7,3,-2},
+            {-2,-2,6000,4,2,10000,1,9,-2,-2,-2,10000,9,1,-2} };
+    } else if (height == 15 && width == 30) {
+        boardSolution = {
+            {-2,-2,60,170,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,60,100,-2,300,40,-2,-2,160,100,-2,240,160,-2,-2,-2,-2},
+            {-2,10170,2,8,30,-2,-2,-2,-2,160,240,60,-2,7420,3,4,11000,8,3,30,11000,9,2,17000,8,9,-2,-2,-2,-2},
+            {20000,8,1,9,2,170,-2,-2,20040,9,8,3,14000,8,1,5,9160,6,1,2,10340,7,3,16170,9,7,-2,-2,-2,-2},
+            {12000,9,3,9000,1,8,230,19030,1,7,9,2,22300,7,2,1,3,9,10000,1,9,16040,1,8,7,-2,-2,-2,-2,-2},
+            {-2,-2,-2,-2,20000,9,6,2,3,19000,7,1,6,5,-2,13160,6,7,-2,24300,8,3,4,9,-2,160,110,60,-2,-2},
+            {-2,-2,-2,-2,-2,10040,9,1,170,60,-2,15000,9,6,9000,7,2,-2,14000,6,7,1,-2,40,12160,7,2,3,-2,-2},
+            {-2,-2,-2,-2,9250,1,8,11000,8,3,-2,17290,8,9,10000,9,1,290,12000,8,4,240,24000,1,7,9,5,2,-2,-2},
+            {-2,-2,-2,8230,5,3,40,10160,9,1,15340,5,7,3,150,5000,4,1,23300,9,6,8,12040,3,9,4030,3,1,-2,-2},
+            {-2,-2,12000,9,3,10030,1,9,15000,2,4,9,5000,4,1,160,19000,4,8,7,8000,7,1,-2,3230,2,1,-2,-2,-2},
+            {-2,-2,25000,6,8,1,3,7,-2,16030,9,7,-2,12000,3,9,10000,3,7,-2,12000,9,3,9030,8,1,-2,-2,-2,-2},
+            {-2,-2,19000,8,9,2,-2,40,15120,1,6,8,-2,11290,4,7,17000,8,9,70,240,-2,8170,2,6,30,-2,-2,-2,-2},
+            {-2,-2,-2,-2,-2,-2,15230,1,5,2,7,170,13000,8,5,240,18070,2,6,1,9,20040,8,1,9,2,160,-2,230,40},
+            {-2,-2,-2,-2,-2,13030,8,3,2,17170,8,9,26030,5,2,9,4,6,20000,2,8,1,9,-2,8000,1,7,10040,9,1},
+            {-2,-2,-2,-2,8000,2,6,12000,4,8,16000,8,1,7,13000,7,1,5,14000,4,7,3,-2,-2,-2,21000,9,1,8,3},
+            {-2,-2,-2,-2,10000,1,9,10000,1,9,-2,11000,2,9,10000,8,2,-2,-2,-2,-2,-2,-2,-2,-2,-2,9000,3,6,-2} };
+    }
 }
-
 /*
 //populates the board with random numbers
 void MainWindow::populateBoardRandom(){
@@ -932,13 +944,13 @@ bool MainWindow::checkSection(int sum, int y, int x, int yDelta, int xDelta){
         // Check if the cell is out of bounds
         if ((y >= (int)board.size()) || (x >= (int)board[0].size())) {
             inSection = false;
-        // Check if the cell is blank
+            // Check if the cell is blank
         } else if (board[y][x] == 0) {
             return false;
-        // Check if the section has come to an end
+            // Check if the section has come to an end
         } else if ((board[y][x] <= 0) || (board[y][x] > 9)) {
             inSection = false;
-        // If the cell is still within the section
+            // If the cell is still within the section
         } else {
             total += board[y][x]; //Add the value of the cell to the total
         }
@@ -1038,10 +1050,10 @@ void MainWindow::valuesInSection(int sum, int y, int x, int yDelta, int xDelta){
         // Check if the cell is out of bounds
         if ((y >= (int)board.size()) || (x >= (int)board[0].size())) {
             inSection = false;
-        // Check if the section has come to an end
+            // Check if the section has come to an end
         } else if ((board[y][x] < 0) || (board[y][x] > 9)) {
             inSection = false;
-        // push 1-9 values to vector numsPresent
+            // push 1-9 values to vector numsPresent
         } else if (board[y][x] != 0) {
             numsPresent.push_back(board[y][x]);
         }
@@ -1115,10 +1127,10 @@ void MainWindow::removeInvalidValues(int sum, int y, int x, int yDelta, int xDel
         // Check if the cell is out of bounds
         if ((y >= (int)board.size()) || (x >= (int)board[0].size())) {
             inSection = false;
-        // Check if the cell is blank and set the possible values
+            // Check if the cell is blank and set the possible values
         } else if (board[y][x] == 0) {
             model->item(y, x)->setText(nums);
-        // Check if the section has come to an end
+            // Check if the section has come to an end
         } else if ((board[y][x] < 0) || (board[y][x] > 9)) {
             inSection = false;
         }
@@ -1207,7 +1219,7 @@ void MainWindow::menuRequest(QPoint pos)
                     // Change the font size
                     f.setPointSize(30);
 
-                // If it was clearValue action
+                    // If it was clearValue action
                 } else if (action->text().contains("Clear")) {
 
                     userMove newMove = userMove(index.row(), index.column(), board[index.row()][index.column()], 0);
