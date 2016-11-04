@@ -169,15 +169,6 @@ void MainWindow::drawBoard(){
         std::cout << std::endl;
         // This code below plays with screen size
         // Not a very good solution, but saves the user from scrolling
-        int w;
-        if (board.size() == 5) {
-            w = model->rowCount() * 150;
-        }
-        else {
-            w = model->rowCount() * 90;
-        }
-        int h = model->columnCount() * 90;
-        this->resize(w, h);
     }
 }
 
@@ -200,6 +191,15 @@ void MainWindow::setBoardSize(int height, int width){
         boardSolution[i].resize(width);
         //boardSolution[i].resize(width);
     }
+    int w;
+    if (board[0].size() == 5) {
+        w = board.size() * 150;
+    }
+    else {
+        w = board[0].size() * 90;
+    }
+    int h = board.size() * 90;
+    this->resize(w, h);
 }
 
 void MainWindow::populateBoard(int height, int width){
@@ -633,7 +633,7 @@ void MainWindow::populateBoardFromFile(){
     //start sorting of undomoves//
     //////////////////////////////
 
-    //need to clear the current undoMove vector
+    //need to clear the current move board
     undoMoves.clear();
 
     //does our normal looping through a string and stopping at each ,
